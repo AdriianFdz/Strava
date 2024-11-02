@@ -3,7 +3,7 @@
  * adapted using GitHub Copilot. It has been thoroughly reviewed 
  * and validated to ensure correctness and that it is free of errors.
  */
-package es.deusto.sd.auctions.facade;
+package es.deusto.sd.strava.facade;
 
 import java.util.Optional;
 
@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.deusto.sd.auctions.dto.CredentialsDTO;
-import es.deusto.sd.auctions.service.AuthService;
+import es.deusto.sd.strava.dto.CredencialesDTO;
+import es.deusto.sd.strava.dto.UsuarioDTO;
+import es.deusto.sd.strava.entity.Usuario;
+import es.deusto.sd.strava.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,6 +34,20 @@ public class AuthController {
 		this.authService = authService;
 	}
     
+	// Register endpoint
+	@Operation(summary = "Register a new user", description = "Allows a user to register by providing the user's details.", responses = {
+			@ApiResponse(responseCode = "201", description = "Created: User registered successfully"),
+			@ApiResponse(responseCode = "400", description = "Bad Request: Invalid user details"), })
+	@PostMapping("/register")
+	public ResponseEntity<Void> register(
+			@Parameter(name = "user", description = "User's details", required = true) 
+			@RequestBody UsuarioDTO user) {
+		
+		Usuario u = new Usuario(user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo());
+		authService.register(u);
+		return new ResponseEntity<>(HttpStatus.CREATED);
+		
+	}
     // Login endpoint
     @Operation(
         summary = "Login to the system",
@@ -44,7 +60,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> login(
     		@Parameter(name = "credentials", description = "User's credentials", required = true)    	
-    		@RequestBody CredentialsDTO credentials) {    	
+    		@RequestBody CredencialesDTO credentials) {    	
         Optional<String> token = authService.login(credentials.getEmail(), credentials.getPassword());
         
     	if (token.isPresent()) {
