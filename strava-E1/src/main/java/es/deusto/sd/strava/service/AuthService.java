@@ -57,13 +57,13 @@ public class AuthService {
         return tokenStore.get(token); 
     }
     
-    // Method to get the Usuario based on the email
-    public Usuario getUsuarioByEmail(String email) {
-		return UsuarioRepository.get(email);
+	public boolean isValidToken(String token) {
+		return tokenStore.containsKey(token);
 	}
 
     // Synchronized method to guarantee unique token generation
     private static synchronized String generateToken() {
         return Long.toHexString(System.currentTimeMillis());
     }
+
 }

@@ -1,24 +1,35 @@
-package es.deusto.sd.strava.entity;
+package es.deusto.sd.strava.dto;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
-import java.util.Objects;
 
-public class Entrenamiento {
+import es.deusto.sd.strava.entity.TipoDeporte;
+import jakarta.validation.constraints.NotNull;
+
+public class EntrenamientoDTO {
+	@NotNull(message = "El token del usuario es obligatorio")
+	private String userToken;
+	@NotNull(message = "El título es obligatorio")
 	private String titulo;
+	@NotNull(message = "El deporte es obligatorio")
 	private TipoDeporte deporte;
+	@NotNull(message = "La distancia es obligatoria")
 	private double distancia;
+	@NotNull(message = "La fecha de inicio es obligatoria")
 	private LocalDate fechaInicio;
+	@NotNull(message = "La hora de inicio es obligatoria")
 	private LocalTime horaInicio;
+	@NotNull(message = "La duración es obligatoria")
 	private int duracion;
 	
-	// Constructor without parameters
-	public Entrenamiento() { }
+	// Constructor sin argumentos
+	public EntrenamientoDTO() {}
 	
-	// Constructor with parameters
-	public Entrenamiento(String titulo, TipoDeporte deporte, double distancia, LocalDate fechaInicio,
+	// Constructor con argumentos
+	public EntrenamientoDTO(String userToken, String titulo, TipoDeporte deporte, double distancia, LocalDate fechaInicio,
 			LocalTime horaInicio, int duracion) {
+		this.userToken = userToken;
 		this.titulo = titulo;
 		this.deporte = deporte;
 		this.distancia = distancia;
@@ -27,8 +38,15 @@ public class Entrenamiento {
 		this.duracion = duracion;
 	}
 
-	// Getters and Setters
-
+	// Getters y setters
+	public String getUserToken() {
+		return userToken;
+	}
+	
+	public void setUserToken(String token) {
+		this.userToken = token;
+	}
+	
 	public String getTitulo() {
 		return titulo;
 	}
@@ -76,28 +94,5 @@ public class Entrenamiento {
 	public void setDuracion(int duracion) {
 		this.duracion = duracion;
 	}
-
-	// HashCode and Equals
-	
-	@Override
-	public int hashCode() {
-		return Objects.hash(deporte, distancia, duracion, fechaInicio, horaInicio, titulo);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Entrenamiento other = (Entrenamiento) obj;
-		return Objects.equals(deporte, other.deporte)
-				&& Double.doubleToLongBits(distancia) == Double.doubleToLongBits(other.distancia)
-				&& duracion == other.duracion && Objects.equals(fechaInicio, other.fechaInicio)
-				&& Objects.equals(horaInicio, other.horaInicio) && Objects.equals(titulo, other.titulo);
-	}	
-	
-	
+		
 }
