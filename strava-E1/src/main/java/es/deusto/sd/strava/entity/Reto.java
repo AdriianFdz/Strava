@@ -1,5 +1,6 @@
 package es.deusto.sd.strava.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,8 +8,8 @@ import java.util.Objects;
 
 public class Reto {
 	private String nombre;
-	private Date fechaInicio;
-	private Date fechaFin;
+	private LocalDate fechaInicio;
+	private LocalDate fechaFin;
 	private double distancia;
 	private int tiempoObjetivo;
 	private TipoDeporte deporte;
@@ -19,7 +20,7 @@ public class Reto {
 	public Reto() { }
 
 	// Constructor with parameters
-	public Reto(String nombre, Date fechaInicio, Date fechaFin, double distancia, int tiempoObjetivo,
+	public Reto(String nombre, LocalDate fechaInicio, LocalDate fechaFin, double distancia, int tiempoObjetivo,
 			TipoDeporte deporte) {
 		super();
 		this.nombre = nombre;
@@ -39,19 +40,19 @@ public class Reto {
 		this.nombre = nombre;
 	}
 
-	public Date getFechaInicio() {
+	public LocalDate getFechaInicio() {
 		return fechaInicio;
 	}
 
-	public void setFechaInicio(Date fechaInicio) {
+	public void setFechaInicio(LocalDate fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 
-	public Date getFechaFin() {
+	public LocalDate getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(Date fechaFin) {
+	public void setFechaFin(LocalDate fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 

@@ -2,6 +2,7 @@ package es.deusto.sd.strava.facade;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.deusto.sd.strava.dto.EntrenamientoDTO;
+import es.deusto.sd.strava.dto.RetoDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
+import es.deusto.sd.strava.entity.Reto;
+import es.deusto.sd.strava.entity.TipoDeporte;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.service.AuthService;
 import es.deusto.sd.strava.service.StravaService;
@@ -73,6 +77,68 @@ public class StravaController {
 		}
 		u.addEntrenamiento(stravaService.parseEntrenamientoDTO(training));
         return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	@Operation(summary = "create a challenge", description = "Allows a user to create a challenge.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: Challenge created successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
+	
+	@PostMapping("/challenges/create")
+	public ResponseEntity<HttpStatus> addReto(
+		@Parameter(name = "Reto", description = "The challenge object to create it", required = true)
+		@RequestBody RetoDTO reto) {
+		Usuario u = authService.getUsuarioByToken(reto.getUserToken());
+		if (u == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		stravaService.listaRetos.add(stravaService.parseRetoDTO(reto));
+        return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	
+	// get challenges endpoint
+	@Operation(summary = "Get user challenge", description = "Allows a users to view the available challenges.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: challenges retrieved successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
+	
+	@PostMapping("/challenges/get")
+	public ResponseEntity<List<Reto>> getChallenges(
+		@Parameter(name = "User token", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+		@RequestBody String userToken,
+		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
+		@RequestParam(required = false, name = "FechaInicio") LocalDate fechaInicio, 
+		@Parameter(name = "FechaFin", description = "The end date to filter the trainings", required = false)
+		@RequestParam(required = false, name = "FechaFin") LocalDate fechaFin,
+	    @Parameter(name = "Deporte", description = "Type of sport", required = false)
+	    @RequestParam(required = false, name = "Deporte") TipoDeporte deporte){
+		Usuario u = authService.getUsuarioByToken(userToken);
+		if (u == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); 
+		}
+		if (fechaInicio != null || fechaFin != null || deporte != null) {
+			return new ResponseEntity<>(stravaService.filtrarRetos(stravaService.getListaRetos(), fechaInicio, fechaFin, deporte), HttpStatus.OK);
+			
+		} else {
+			List<Reto> sublista = stravaService.listaRetos.size() > 5 ? stravaService.listaRetos.subList(0, 5) : stravaService.listaRetos; //Generado por chatGPT para crear una sublista que muestre solo los 5 primeros de la lista
+			return new ResponseEntity<>(sublista, HttpStatus.OK);
+		}
+	}
+	
+	//get users challenges endpoint
+	
+	@Operation(summary = "Get user challenges", description = "Allows a user to get his acepted challenges.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: User challenges retrieved successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
+	
+	@PostMapping("/userChallenges/get")
+	public ResponseEntity<Map<Reto, Double>> getUserChallenges(
+		@Parameter(name = "User token", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+		@RequestBody String userToken){
+		Usuario u = authService.getUsuarioByToken(userToken);
+		if (u == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+			return new ResponseEntity<>(stravaService.calcularPorcentajeReto(u.getRetosAceptados()), HttpStatus.OK);
 	}
 	
 }

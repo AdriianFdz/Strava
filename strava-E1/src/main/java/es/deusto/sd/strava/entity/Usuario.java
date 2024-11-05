@@ -21,7 +21,6 @@ public class Usuario {
 	private int frecuenciaCardiacaReposo;
 	
 	private List<Entrenamiento> entrenamientos = new ArrayList<>();
-	private List<Reto> retosCreados = new ArrayList<>();
 	private List<Reto> retosAceptados = new ArrayList<>();
 	
 	// Constructor without parameters
@@ -103,14 +102,6 @@ public class Usuario {
 		this.entrenamientos.add(entrenamiento);
 	}
 	
-	public List<Reto> getRetosCreados() {
-		return retosCreados;
-	}
-	
-	public void addRetoCreado(Reto retoCreado) {
-		this.retosCreados.add(retoCreado);
-	}
-	
 	public List<Reto> getRetosAceptados() {
 		return retosAceptados;
 	}
@@ -125,7 +116,7 @@ public class Usuario {
 	@Override
 	public int hashCode() {
 		return Objects.hash(altura, email, entrenamientos, fechaNacimiento, frecuenciaCardiacaMax,
-				frecuenciaCardiacaReposo, nombre, peso, retosAceptados, retosCreados);
+				frecuenciaCardiacaReposo, nombre, peso, retosAceptados);
 	}
 
 	@Override
@@ -143,8 +134,7 @@ public class Usuario {
 				&& frecuenciaCardiacaMax == other.frecuenciaCardiacaMax
 				&& frecuenciaCardiacaReposo == other.frecuenciaCardiacaReposo && Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(peso) == Double.doubleToLongBits(other.peso)
-				&& Objects.equals(retosAceptados, other.retosAceptados)
-				&& Objects.equals(retosCreados, other.retosCreados);
+				&& Objects.equals(retosAceptados, other.retosAceptados);
 	}	
 	
 	
