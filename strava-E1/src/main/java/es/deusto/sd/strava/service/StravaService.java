@@ -19,7 +19,7 @@ import es.deusto.sd.strava.entity.Usuario;
 @Service
 public class StravaService {
 	
-	public List<Reto> listaRetos = new ArrayList<>();
+	private List<Reto> listaRetos = new ArrayList<>();
 	
 	public List<Reto> getListaRetos() {
 		return listaRetos;

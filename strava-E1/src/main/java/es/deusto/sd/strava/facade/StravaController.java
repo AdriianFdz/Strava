@@ -91,7 +91,7 @@ public class StravaController {
 		if (u == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		stravaService.listaRetos.add(stravaService.parseRetoDTO(reto));
+		stravaService.getListaRetos().add(stravaService.parseRetoDTO(reto));
         return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -119,7 +119,7 @@ public class StravaController {
 			return new ResponseEntity<>(stravaService.filtrarRetos(stravaService.getListaRetos(), fechaInicio, fechaFin, deporte), HttpStatus.OK);
 			
 		} else {
-			List<Reto> sublista = stravaService.listaRetos.size() > 5 ? stravaService.listaRetos.subList(0, 5) : stravaService.listaRetos; //Generado por chatGPT para crear una sublista que muestre solo los 5 primeros de la lista
+			List<Reto> sublista = stravaService.getListaRetos().size() > 5 ? stravaService.getListaRetos().subList(0, 5) : stravaService.getListaRetos(); //Generado por chatGPT para crear una sublista que muestre solo los 5 primeros de la lista
 			return new ResponseEntity<>(sublista, HttpStatus.OK);
 		}
 	}
