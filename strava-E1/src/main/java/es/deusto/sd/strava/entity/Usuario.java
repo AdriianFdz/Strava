@@ -116,7 +116,7 @@ public class Usuario {
 	@Override
 	public int hashCode() {
 		return Objects.hash(altura, email, entrenamientos, fechaNacimiento, frecuenciaCardiacaMax,
-				frecuenciaCardiacaReposo, nombre, peso, retosAceptados);
+				frecuenciaCardiacaReposo, nombre, peso);
 	}
 
 	@Override

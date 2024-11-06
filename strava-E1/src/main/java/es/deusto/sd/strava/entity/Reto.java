@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Reto {
+	private int id;
 	private String nombre;
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
@@ -20,9 +21,10 @@ public class Reto {
 	public Reto() { }
 
 	// Constructor with parameters
-	public Reto(String nombre, LocalDate fechaInicio, LocalDate fechaFin, double distancia, int tiempoObjetivo,
+	public Reto(int id, String nombre, LocalDate fechaInicio, LocalDate fechaFin, double distancia, int tiempoObjetivo,
 			TipoDeporte deporte) {
 		super();
+		this.id = id;
 		this.nombre = nombre;
 		this.fechaInicio = fechaInicio;
 		this.fechaFin = fechaFin;
@@ -32,6 +34,10 @@ public class Reto {
 	}
 
 	// Getters and Setters
+	public int getId() {
+		return id;
+	}
+	
 	public String getNombre() {
 		return nombre;
 	}
@@ -91,7 +97,7 @@ public class Reto {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(deporte, distancia, fechaFin, fechaInicio, nombre, participantes, tiempoObjetivo);
+		return Objects.hash(deporte, distancia, fechaFin, fechaInicio, id, nombre, participantes, tiempoObjetivo);
 	}
 
 	@Override
@@ -106,7 +112,7 @@ public class Reto {
 		return deporte == other.deporte
 				&& Double.doubleToLongBits(distancia) == Double.doubleToLongBits(other.distancia)
 				&& Objects.equals(fechaFin, other.fechaFin) && Objects.equals(fechaInicio, other.fechaInicio)
-				&& Objects.equals(nombre, other.nombre) && Objects.equals(participantes, other.participantes)
-				&& tiempoObjetivo == other.tiempoObjetivo;
+				&& id == other.id && Objects.equals(nombre, other.nombre)
+				&& Objects.equals(participantes, other.participantes) && tiempoObjetivo == other.tiempoObjetivo;
 	}
 }

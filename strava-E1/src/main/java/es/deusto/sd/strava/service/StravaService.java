@@ -1,14 +1,15 @@
 package es.deusto.sd.strava.service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 
+import es.deusto.sd.strava.dto.AceptarRetoDTO;
 import es.deusto.sd.strava.dto.EntrenamientoDTO;
 import es.deusto.sd.strava.dto.RetoDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
@@ -19,14 +20,16 @@ import es.deusto.sd.strava.entity.Usuario;
 @Service
 public class StravaService {
 	
-	private List<Reto> listaRetos = new ArrayList<>();
+	private Map<Integer, Reto> mapaRetos = new HashMap<>();
+    private final AtomicInteger idRetoGenerator = new AtomicInteger(0);
 	
-	public List<Reto> getListaRetos() {
-		return listaRetos;
+	public Map<Integer, Reto> getMapaRetos() {
+		return mapaRetos;
 	}
 
 	public Reto parseRetoDTO(RetoDTO dto) {
 		return new Reto(
+				idRetoGenerator.incrementAndGet(),
 				dto.getNombre(),
 				dto.getFechaInicio(),
 				dto.getFechaFin(),
@@ -36,10 +39,10 @@ public class StravaService {
 			);
 	}
 	
-	public List<Reto> filtrarRetos(List<Reto> retos, LocalDate fechaInicio, LocalDate fechaFin, TipoDeporte deporte) {
+	public List<Reto> filtrarRetos(Map<Integer, Reto> retos, LocalDate fechaInicio, LocalDate fechaFin, TipoDeporte deporte) {
 	    List<Reto> resultado = new ArrayList<>();
 
-	    for (Reto reto : retos) {
+	    for (Reto reto : retos.values()) {
 	        if (fechaInicio != null && fechaFin != null && deporte != null) {
 	            if ((!reto.getFechaInicio().isBefore(fechaInicio)) && (!reto.getFechaInicio().isAfter(fechaFin)) && reto.getDeporte().equals(deporte)) {
 	                resultado.add(reto);
@@ -81,12 +84,12 @@ public class StravaService {
 	    return resultado;
 	}
 	
-    public Map<Reto, Double> calcularPorcentajeReto(List<Reto> retos) {
-        Map<Reto, Double> porcentajeReto = new HashMap<>();
+    public Map<Integer, Double> calcularPorcentajeReto(List<Reto> retos) {
+        Map<Integer, Double> porcentajeReto = new HashMap<>();
 
         for (Reto reto : retos) {
             double porcentaje = reto.getTiempoObjetivo() / reto.getDistancia();
-            porcentajeReto.put(reto, porcentaje);
+            porcentajeReto.put(reto.getId(), porcentaje);
         }
 
         return porcentajeReto;
@@ -128,5 +131,10 @@ public class StravaService {
 	    return resultado;
 	}
 
+	public Reto parseAceptarRetoDTO(AceptarRetoDTO aceptarReto, Usuario participante) {
+		Reto reto = mapaRetos.get(aceptarReto.getIdReto());
+		reto.addParticipantes(participante);
+		return reto;
+	}
 
 }
