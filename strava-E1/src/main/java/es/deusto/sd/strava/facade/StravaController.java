@@ -7,13 +7,15 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.deusto.sd.strava.dto.AceptarRetoDTO;
 import es.deusto.sd.strava.dto.EntrenamientoDTO;
 import es.deusto.sd.strava.dto.RetoDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
@@ -44,15 +46,17 @@ public class StravaController {
 			@ApiResponse(responseCode = "200", description = "Success: User trainings retrieved successfully"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PostMapping("/trainings/get")
+	@GetMapping("users/{userID}/trainings")
 	public ResponseEntity<List<Entrenamiento>> getTrainings(
-		@Parameter(name = "User token", description = "The token of a logged user", required = true, example = "192ee4daf90") 
-		@RequestBody String userToken,
+		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+		@RequestParam("userToken") String userToken,
+		@Parameter(name = "userID", description = "The id of a registered user", required = true, example = "1")
+		@PathVariable("userID") int userID,
 		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
 		@RequestParam(required = false, name = "FechaInicio") LocalDate fechaInicio, 
 		@Parameter(name = "FechaFin", description = "The end date to filter the trainings", required = false)
 		@RequestParam(required = false, name = "FechaFin") LocalDate fechaFin){
-		Usuario u = authService.getUsuarioByToken(userToken);
+		Usuario u = authService.getUsuarioByID(userID, userToken);
 		if (u == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
@@ -69,11 +73,15 @@ public class StravaController {
 			@ApiResponse(responseCode = "200", description = "Success: Training created successfully"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PostMapping("/trainings/create")
+	@PostMapping("users/{userID}/trainings")
 	public ResponseEntity<HttpStatus> addTraining(
+		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90")
+		@RequestParam("userToken") String userToken,
+		@Parameter(name = "userID", description = "The id of a registered user", required = true, example = "1")
+		@PathVariable("userID") int userID,
 		@Parameter(name = "Training", description = "The training object to create it", required = true)
 		@RequestBody EntrenamientoDTO training) {
-		Usuario u = authService.getUsuarioByToken(training.getUserToken());
+		Usuario u = authService.getUsuarioByID(userID, userToken);
 		if (u == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
@@ -81,16 +89,18 @@ public class StravaController {
         return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	// create challenge endpoint
 	@Operation(summary = "create a challenge", description = "Allows a user to create a challenge.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success: Challenge created successfully"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PostMapping("/challenges/create")
+	@PostMapping("challenges")
 	public ResponseEntity<HttpStatus> addReto(
+		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90")
+		@RequestParam("userToken") String userToken,
 		@Parameter(name = "Reto", description = "The challenge object to create it", required = true)
 		@RequestBody RetoDTO retoDTO) {
-		Usuario u = authService.getUsuarioByToken(retoDTO.getUserToken());
-		if (u == null) {
+		if (!authService.isValidToken(userToken)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		Reto reto = stravaService.parseRetoDTO(retoDTO);
@@ -99,23 +109,22 @@ public class StravaController {
 	}
 	
 	
-	// get challenges endpoint
+	// get all challenges endpoint
 	@Operation(summary = "Get all challenges", description = "Allows a registered user to view all the available challenges.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success: challenges retrieved successfully"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PostMapping("/challenges/get")
+	@GetMapping("challenges")
 	public ResponseEntity<List<Reto>> getChallenges(
-		@Parameter(name = "User token", description = "The token of a logged user", required = true, example = "192ee4daf90") 
-		@RequestBody String userToken,
+		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+		@RequestParam("userToken") String userToken,
 		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
 		@RequestParam(required = false, name = "FechaInicio") LocalDate fechaInicio, 
 		@Parameter(name = "FechaFin", description = "The end date to filter the trainings", required = false)
 		@RequestParam(required = false, name = "FechaFin") LocalDate fechaFin,
 	    @Parameter(name = "Deporte", description = "Type of sport", required = false)
 	    @RequestParam(required = false, name = "Deporte") TipoDeporte deporte){
-		Usuario u = authService.getUsuarioByToken(userToken);
-		if (u == null) {
+		if (!authService.isValidToken(userToken)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); 
 		}
 		if (fechaInicio != null || fechaFin != null || deporte != null) {
@@ -128,20 +137,21 @@ public class StravaController {
 	}
 	
 	//get users challenges endpoint
-	
 	@Operation(summary = "Get user challenges", description = "Allows a user to get his acepted challenges.", responses = {
 			@ApiResponse(responseCode = "200", description = "Success: User challenges retrieved successfully"),
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PostMapping("/userChallenges/get")
+	@GetMapping("users/{userID}/challenges")
 	public ResponseEntity<Map<Integer, Double>> getUserChallenges(
-		@Parameter(name = "User token", description = "The token of a logged user", required = true, example = "192ee4daf90") 
-		@RequestBody String userToken){
-		Usuario u = authService.getUsuarioByToken(userToken);
+			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+			@RequestParam("userToken") String userToken,
+			@Parameter(name = "userID", description = "The id of a registered user", required = true, example = "1")
+			@PathVariable("userID") int userID){
+		Usuario u = authService.getUsuarioByID(userID, userToken);
 		if (u == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-			return new ResponseEntity<>(stravaService.calcularPorcentajeReto(u.getRetosAceptados()), HttpStatus.OK);
+			return new ResponseEntity<>(stravaService.calcularPorcentajeReto(u.getRetosAceptados(), u.getEntrenamientos()), HttpStatus.OK);
 	}
 	
 	//accept challenge endpoint
@@ -149,14 +159,19 @@ public class StravaController {
             @ApiResponse(responseCode = "200", description = "Success: Challenge accepted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PostMapping("/challenges/accept")
+	@PutMapping("users/{userID}/challenges/{idReto}")
 	public ResponseEntity<HttpStatus> acceptChallenge(
-			@Parameter(name = "Reto", description = "The challenge object to accept it", required = true) @RequestBody AceptarRetoDTO aceptarReto) {
-		Usuario u = authService.getUsuarioByToken(aceptarReto.getUserToken());
+			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+			@RequestParam(required = true, name = "userToken") String userToken,
+			@Parameter(name = "userID", description = "The id of a registered user", required = true)
+			@PathVariable("userID") int userID,
+			@Parameter(name = "idReto", description = "The id of the challenge to accept it", required = true)
+			@PathVariable("idReto") int idReto) {
+		Usuario u = authService.getUsuarioByID(userID, userToken);
 		if (u == null) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		u.addRetosAceptados(stravaService.parseAceptarRetoDTO(aceptarReto, u));
+		u.addRetosAceptados(stravaService.getMapaRetos().get(idReto));
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	

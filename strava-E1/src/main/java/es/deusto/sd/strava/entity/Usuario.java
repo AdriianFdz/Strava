@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Usuario {
-
+	private int id;
 	private String email;
 	private String nombre;
 	private LocalDate fechaNacimiento;
@@ -19,6 +19,8 @@ public class Usuario {
 	private double altura;
 	private int frecuenciaCardiacaMax;
 	private int frecuenciaCardiacaReposo;
+	//TODO meta o google enum para iniciar sesion
+	//private ServidorAuth servidorAuth;
 	
 	private List<Entrenamiento> entrenamientos = new ArrayList<>();
 	private List<Reto> retosAceptados = new ArrayList<>();
@@ -26,7 +28,8 @@ public class Usuario {
 	// Constructor without parameters
 	public Usuario() { }
 	
-	public Usuario(String email, String nombre, LocalDate fechaNacimiento, double peso, double altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo) {
+	public Usuario(int id, String email, String nombre, LocalDate fechaNacimiento, double peso, double altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo) {
+		this.id = id;
 		this.email = email;
 		this.nombre = nombre;
 		this.fechaNacimiento = fechaNacimiento;
@@ -38,6 +41,10 @@ public class Usuario {
 
 	
 	// Getters and Setters
+	public int getId() {
+		return id;
+	}
+	
 	public String getEmail() {
 		return email;
 	}
@@ -116,7 +123,7 @@ public class Usuario {
 	@Override
 	public int hashCode() {
 		return Objects.hash(altura, email, entrenamientos, fechaNacimiento, frecuenciaCardiacaMax,
-				frecuenciaCardiacaReposo, nombre, peso);
+				frecuenciaCardiacaReposo, id, nombre, peso, retosAceptados);
 	}
 
 	@Override
@@ -132,7 +139,8 @@ public class Usuario {
 				&& Objects.equals(email, other.email) && Objects.equals(entrenamientos, other.entrenamientos)
 				&& Objects.equals(fechaNacimiento, other.fechaNacimiento)
 				&& frecuenciaCardiacaMax == other.frecuenciaCardiacaMax
-				&& frecuenciaCardiacaReposo == other.frecuenciaCardiacaReposo && Objects.equals(nombre, other.nombre)
+				&& frecuenciaCardiacaReposo == other.frecuenciaCardiacaReposo && id == other.id
+				&& Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(peso) == Double.doubleToLongBits(other.peso)
 				&& Objects.equals(retosAceptados, other.retosAceptados);
 	}	

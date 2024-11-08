@@ -2,7 +2,6 @@ package es.deusto.sd.strava.entity;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -11,8 +10,8 @@ public class Reto {
 	private String nombre;
 	private LocalDate fechaInicio;
 	private LocalDate fechaFin;
-	private double distancia;
-	private int tiempoObjetivo;
+	private double objetivo;
+	private TipoObjetivo tipoObjetivo;
 	private TipoDeporte deporte;
 	
 	private List<Usuario> participantes = new ArrayList<>();
@@ -21,15 +20,15 @@ public class Reto {
 	public Reto() { }
 
 	// Constructor with parameters
-	public Reto(int id, String nombre, LocalDate fechaInicio, LocalDate fechaFin, double distancia, int tiempoObjetivo,
+	public Reto(int id, String nombre, LocalDate fechaInicio, LocalDate fechaFin, double objetivo, TipoObjetivo tipoObjetivo,
 			TipoDeporte deporte) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
 		this.fechaInicio = fechaInicio;
 		this.fechaFin = fechaFin;
-		this.distancia = distancia;
-		this.tiempoObjetivo = tiempoObjetivo;
+		this.objetivo = objetivo;
+		this.tipoObjetivo = tipoObjetivo;
 		this.deporte = deporte;
 	}
 
@@ -61,22 +60,22 @@ public class Reto {
 	public void setFechaFin(LocalDate fechaFin) {
 		this.fechaFin = fechaFin;
 	}
-
-	public double getDistancia() {
-		return distancia;
+	
+	public double getObjetivo() {
+		return objetivo;
 	}
-
-	public void setDistancia(double distancia) {
-		this.distancia = distancia;
+	
+	public void setObjetivo(double objetivo) {
+		this.objetivo = objetivo;
 	}
-
-	public int getTiempoObjetivo() {
-		return tiempoObjetivo;
+	
+	public TipoObjetivo getTipoObjetivo() {
+		return tipoObjetivo;
 	}
-
-	public void setTiempoObjetivo(int tiempoObjetivo) {
-		this.tiempoObjetivo = tiempoObjetivo;
-	}
+	
+	public void setTipoObjetivo(TipoObjetivo tipoObjetivo) {
+        this.tipoObjetivo = tipoObjetivo;
+    }
 
 	public TipoDeporte getDeporte() {
 		return deporte;
@@ -97,7 +96,7 @@ public class Reto {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(deporte, distancia, fechaFin, fechaInicio, id, nombre, participantes, tiempoObjetivo);
+		return Objects.hash(deporte, fechaFin, fechaInicio, id, nombre, objetivo, participantes, tipoObjetivo);
 	}
 
 	@Override
@@ -109,10 +108,10 @@ public class Reto {
 		if (getClass() != obj.getClass())
 			return false;
 		Reto other = (Reto) obj;
-		return deporte == other.deporte
-				&& Double.doubleToLongBits(distancia) == Double.doubleToLongBits(other.distancia)
-				&& Objects.equals(fechaFin, other.fechaFin) && Objects.equals(fechaInicio, other.fechaInicio)
-				&& id == other.id && Objects.equals(nombre, other.nombre)
-				&& Objects.equals(participantes, other.participantes) && tiempoObjetivo == other.tiempoObjetivo;
+		return deporte == other.deporte && Objects.equals(fechaFin, other.fechaFin)
+				&& Objects.equals(fechaInicio, other.fechaInicio) && id == other.id
+				&& Objects.equals(nombre, other.nombre)
+				&& Double.doubleToLongBits(objetivo) == Double.doubleToLongBits(other.objetivo)
+				&& Objects.equals(participantes, other.participantes) && tipoObjetivo == other.tipoObjetivo;
 	}
 }

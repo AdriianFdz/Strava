@@ -1,29 +1,23 @@
 package es.deusto.sd.strava.entity;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.Date;
 import java.util.Objects;
 
 public class Entrenamiento {
 	private String titulo;
 	private TipoDeporte deporte;
 	private double distancia;
-	private LocalDate fechaInicio;
-	private LocalTime horaInicio;
+	private long fechaHora;
 	private int duracion;
 	
 	// Constructor without parameters
 	public Entrenamiento() { }
 	
 	// Constructor with parameters
-	public Entrenamiento(String titulo, TipoDeporte deporte, double distancia, LocalDate fechaInicio,
-			LocalTime horaInicio, int duracion) {
+	public Entrenamiento(String titulo, TipoDeporte deporte, double distancia, long fechaHora, int duracion) {
 		this.titulo = titulo;
 		this.deporte = deporte;
 		this.distancia = distancia;
-		this.fechaInicio = fechaInicio;
-		this.horaInicio = horaInicio;
+		this.fechaHora = fechaHora;
 		this.duracion = duracion;
 	}
 
@@ -53,20 +47,12 @@ public class Entrenamiento {
 		this.distancia = distancia;
 	}
 
-	public LocalDate getFechaInicio() {
-		return fechaInicio;
+	public long getFechaHora() {
+		return fechaHora;
 	}
-
-	public void setFechaInicio(LocalDate fechaInicio) {
-		this.fechaInicio = fechaInicio;
-	}
-
-	public LocalTime getHoraInicio() {
-		return horaInicio;
-	}
-
-	public void setHoraInicio(LocalTime horaInicio) {
-		this.horaInicio = horaInicio;
+	
+	public void setFechaHora(long fechaHora) {
+		this.fechaHora = fechaHora;
 	}
 
 	public int getDuracion() {
@@ -81,7 +67,7 @@ public class Entrenamiento {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(deporte, distancia, duracion, fechaInicio, horaInicio, titulo);
+		return Objects.hash(deporte, distancia, duracion, fechaHora, titulo);
 	}
 
 	@Override
@@ -93,10 +79,9 @@ public class Entrenamiento {
 		if (getClass() != obj.getClass())
 			return false;
 		Entrenamiento other = (Entrenamiento) obj;
-		return Objects.equals(deporte, other.deporte)
+		return deporte == other.deporte
 				&& Double.doubleToLongBits(distancia) == Double.doubleToLongBits(other.distancia)
-				&& duracion == other.duracion && Objects.equals(fechaInicio, other.fechaInicio)
-				&& Objects.equals(horaInicio, other.horaInicio) && Objects.equals(titulo, other.titulo);
+				&& duracion == other.duracion && fechaHora == other.fechaHora && Objects.equals(titulo, other.titulo);
 	}	
 	
 	

@@ -3,13 +3,16 @@ package es.deusto.sd.strava.service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 
+import es.deusto.sd.strava.dto.UsuarioDTO;
 import es.deusto.sd.strava.entity.Usuario;
 
 @Service
 public class AuthService {
+    private final AtomicInteger idUserGenerator = new AtomicInteger(0);
 
     // Simulating a Usuario repository
     private static Map<String, Usuario> UsuarioRepository = new HashMap<>();
@@ -53,14 +56,27 @@ public class AuthService {
     }
     
     // Method to get the Usuario based on the token
-    public Usuario getUsuarioByToken(String token) {
-        return tokenStore.get(token); 
-    }
+	public Usuario getUsuarioByToken(String token) {
+		return tokenStore.get(token) != null ? tokenStore.get(token) : null;
+	}
+    
+    // Method to get the Usuario based on the ID and token
+	public Usuario getUsuarioByID(int id, String token) {
+		Usuario u = tokenStore.get(token);
+		if (u != null && u.getId() == id) {
+			return u;
+		}
+		return null;
+	}
     
 	public boolean isValidToken(String token) {
 		return tokenStore.containsKey(token);
 	}
 
+	public Usuario parseUsuarioDTO(UsuarioDTO user) {
+		return new Usuario(idUserGenerator.incrementAndGet(), user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo());
+	}
+	
     // Synchronized method to guarantee unique token generation
     private static synchronized String generateToken() {
         return Long.toHexString(System.currentTimeMillis());

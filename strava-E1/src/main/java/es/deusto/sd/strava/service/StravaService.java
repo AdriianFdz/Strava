@@ -1,6 +1,8 @@
 package es.deusto.sd.strava.service;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,13 +11,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 
-import es.deusto.sd.strava.dto.AceptarRetoDTO;
 import es.deusto.sd.strava.dto.EntrenamientoDTO;
 import es.deusto.sd.strava.dto.RetoDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
 import es.deusto.sd.strava.entity.Reto;
 import es.deusto.sd.strava.entity.TipoDeporte;
-import es.deusto.sd.strava.entity.Usuario;
 
 @Service
 public class StravaService {
@@ -33,8 +33,8 @@ public class StravaService {
 				dto.getNombre(),
 				dto.getFechaInicio(),
 				dto.getFechaFin(),
-				dto.getDistancia(),
-				dto.getTiempoObjetivo(),
+				dto.getObjetivo(),
+				dto.getTipoObjetivo(),
 				dto.getDeporte()
 			);
 	}
@@ -84,11 +84,27 @@ public class StravaService {
 	    return resultado;
 	}
 	
-    public Map<Integer, Double> calcularPorcentajeReto(List<Reto> retos) {
-        Map<Integer, Double> porcentajeReto = new HashMap<>();
-
+    public Map<Integer, Double> calcularPorcentajeReto(List<Reto> retos, List<Entrenamiento> entrenamientos) {
+        Map<Integer, Double> porcentajeReto = new HashMap<>();       
+        
         for (Reto reto : retos) {
-            double porcentaje = reto.getTiempoObjetivo() / reto.getDistancia();
+        	double resultado = 0;
+        	for (Entrenamiento entrenamiento : entrenamientos) {
+        		if (reto.getDeporte() != entrenamiento.getDeporte()) {
+					continue;
+				}
+				if (!reto.getFechaInicio().isAfter(timeStampToLocalDate(entrenamiento.getFechaHora())) && !reto.getFechaFin().isBefore(timeStampToLocalDate(entrenamiento.getFechaHora()))) {
+					switch(reto.getTipoObjetivo()) {
+                        case DISTANCIA:
+                            resultado += entrenamiento.getDistancia();
+                            break;
+                        case TIEMPO:
+                            resultado += entrenamiento.getDuracion();
+                            break;
+                    }
+				}
+        	}
+            double porcentaje = (resultado / reto.getObjetivo())*100;
             porcentajeReto.put(reto.getId(), porcentaje);
         }
 
@@ -101,8 +117,7 @@ public class StravaService {
             dto.getTitulo(),
             dto.getDeporte(),
             dto.getDistancia(),
-            dto.getFechaInicio(),
-            dto.getHoraInicio(),
+            dto.getFechaHora(),
             dto.getDuracion()
         );
 	}
@@ -112,17 +127,17 @@ public class StravaService {
 
 	    for (Entrenamiento entrenamiento : entrenamientos) {
 	        if (fechaInicio != null && fechaFin != null) {
-	            if ((!entrenamiento.getFechaInicio().isBefore(fechaInicio)) && (!entrenamiento.getFechaInicio().isAfter(fechaFin))) {
+	            if ((!timeStampToLocalDate(entrenamiento.getFechaHora()).isBefore(fechaInicio)) && (!timeStampToLocalDate(entrenamiento.getFechaHora()).isAfter(fechaFin))) {
 	                resultado.add(entrenamiento);
 	            }
 	        }
 	        else if (fechaInicio != null) {
-	            if (!entrenamiento.getFechaInicio().isBefore(fechaInicio)) {
+	            if (!timeStampToLocalDate(entrenamiento.getFechaHora()).isBefore(fechaInicio)) {
 	                resultado.add(entrenamiento);
 	            }
 	        }
 	        else if (fechaFin != null) {
-	            if (!entrenamiento.getFechaInicio().isAfter(fechaFin)) {
+	            if (!timeStampToLocalDate(entrenamiento.getFechaHora()).isAfter(fechaFin)) {
 	                resultado.add(entrenamiento);
 	            }
 	        }
@@ -130,11 +145,8 @@ public class StravaService {
 
 	    return resultado;
 	}
-
-	public Reto parseAceptarRetoDTO(AceptarRetoDTO aceptarReto, Usuario participante) {
-		Reto reto = mapaRetos.get(aceptarReto.getIdReto());
-		reto.addParticipantes(participante);
-		return reto;
+	
+	public LocalDate timeStampToLocalDate(long timestamp) {
+		return Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
 	}
-
 }

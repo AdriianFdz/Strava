@@ -43,7 +43,7 @@ public class AuthController {
 			@Parameter(name = "user", description = "User's details", required = true) 
 			@RequestBody UsuarioDTO user) {
 		
-		Usuario u = new Usuario(user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo());
+		Usuario u = authService.parseUsuarioDTO(user);
 		authService.register(u);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 		
