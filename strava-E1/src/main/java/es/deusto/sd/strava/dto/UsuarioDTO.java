@@ -2,6 +2,7 @@ package es.deusto.sd.strava.dto;
 
 import java.time.LocalDate;
 
+import es.deusto.sd.strava.entity.ServidorAuth;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -14,7 +15,10 @@ public class UsuarioDTO {
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
     private LocalDate fechaNacimiento;
-
+    
+    @NotNull(message = "El servidor de autenticación es obligatorio")
+    private ServidorAuth servidorAuth;
+    
     // Campos opcionales
     private double peso;
     private double altura;
@@ -26,7 +30,7 @@ public class UsuarioDTO {
     
     //Constructor con argumentos
 	public UsuarioDTO(String email, String nombre, LocalDate fechaNacimiento, Double peso, Integer altura,
-			int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo) {
+			int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
 		this.email = email;
 		this.nombre = nombre;
 		this.fechaNacimiento = fechaNacimiento;
@@ -34,6 +38,7 @@ public class UsuarioDTO {
 		this.altura = altura;
 		this.frecuenciaCardiacaMax = frecuenciaCardiacaMax;
 		this.frecuenciaCardiacaReposo = frecuenciaCardiacaReposo;
+		this.servidorAuth = servidorAuth;
 	}    
 	
     // Getters y setters
@@ -79,6 +84,11 @@ public class UsuarioDTO {
 	public void setFrecuenciaCardiacaReposo(int frecuenciaCardiacaReposo) {
 		this.frecuenciaCardiacaReposo = frecuenciaCardiacaReposo;
 	}
-
+	public ServidorAuth getServidorAuth() {
+		return servidorAuth;
+	}
+	public void setServidorAuth(ServidorAuth servidorAuth) {
+		this.servidorAuth = servidorAuth;
+	}
     
 }

@@ -19,8 +19,7 @@ public class Usuario {
 	private double altura;
 	private int frecuenciaCardiacaMax;
 	private int frecuenciaCardiacaReposo;
-	//TODO meta o google enum para iniciar sesion
-	//private ServidorAuth servidorAuth;
+	private ServidorAuth servidorAuth;
 	
 	private List<Entrenamiento> entrenamientos = new ArrayList<>();
 	private List<Reto> retosAceptados = new ArrayList<>();
@@ -28,7 +27,7 @@ public class Usuario {
 	// Constructor without parameters
 	public Usuario() { }
 	
-	public Usuario(int id, String email, String nombre, LocalDate fechaNacimiento, double peso, double altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo) {
+	public Usuario(int id, String email, String nombre, LocalDate fechaNacimiento, double peso, double altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
 		this.id = id;
 		this.email = email;
 		this.nombre = nombre;
@@ -37,6 +36,7 @@ public class Usuario {
 		this.altura = altura;
 		this.frecuenciaCardiacaMax = frecuenciaCardiacaMax;
 		this.frecuenciaCardiacaReposo = frecuenciaCardiacaReposo;
+		this.servidorAuth = servidorAuth;
 	}
 
 	
@@ -117,13 +117,18 @@ public class Usuario {
 		this.retosAceptados.add(retoAceptado);
 	}
 	
-	// HashCode and Equals
+	public ServidorAuth getServidorAuth() {
+		return servidorAuth;
+	}
 	
-
+	public void setServidorAuth(ServidorAuth servidorAuth) {
+		this.servidorAuth = servidorAuth;
+	}
+	
 	@Override
 	public int hashCode() {
 		return Objects.hash(altura, email, entrenamientos, fechaNacimiento, frecuenciaCardiacaMax,
-				frecuenciaCardiacaReposo, id, nombre, peso, retosAceptados);
+				frecuenciaCardiacaReposo, id, nombre, peso, retosAceptados, servidorAuth);
 	}
 
 	@Override
@@ -142,7 +147,7 @@ public class Usuario {
 				&& frecuenciaCardiacaReposo == other.frecuenciaCardiacaReposo && id == other.id
 				&& Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(peso) == Double.doubleToLongBits(other.peso)
-				&& Objects.equals(retosAceptados, other.retosAceptados);
+				&& Objects.equals(retosAceptados, other.retosAceptados) && servidorAuth == other.servidorAuth;
 	}	
 	
 	

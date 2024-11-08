@@ -25,7 +25,16 @@ public class AuthService {
         Usuario Usuario = UsuarioRepository.get(email);
         
         if (Usuario != null) {
-        	// Meta o google comprueba la contraseña
+//        	switch (Usuario.getServidorAuth()) {
+//				case GOOGLE:
+//					// Check if the password is correct
+//					
+//					break;
+//				case META:
+//					// Check if the password is correct
+//					
+//					break;
+//        	}
         	
         	// Si es correcta
             String token = generateToken();  // Generate a random token for the session
@@ -74,7 +83,7 @@ public class AuthService {
 	}
 
 	public Usuario parseUsuarioDTO(UsuarioDTO user) {
-		return new Usuario(idUserGenerator.incrementAndGet(), user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo());
+		return new Usuario(idUserGenerator.incrementAndGet(), user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo(), user.getServidorAuth());
 	}
 	
     // Synchronized method to guarantee unique token generation
