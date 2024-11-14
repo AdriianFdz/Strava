@@ -6,6 +6,7 @@
 package es.deusto.sd.strava.facade;
 
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AuthController {
 
     private AuthService authService;
+    private final AtomicInteger idUserGenerator = new AtomicInteger(0);
+
     
 	public AuthController(AuthService authService) {
 		this.authService = authService;
@@ -44,7 +47,7 @@ public class AuthController {
 			@Parameter(name = "user", description = "User's details", required = true) 
 			@RequestBody UsuarioDTO user) {
 		
-		Usuario u = authService.parseUsuarioDTO(user);
+		Usuario u = parseUsuarioDTO(user);
 		authService.register(u);
 		return new ResponseEntity<>(HttpStatus.CREATED);
 		
@@ -92,4 +95,9 @@ public class AuthController {
         	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }        
     }
+    
+    // parse DTO to entity
+	public Usuario parseUsuarioDTO(UsuarioDTO user) {
+		return new Usuario(idUserGenerator.incrementAndGet(), user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo(), user.getServidorAuth());
+	}
 }

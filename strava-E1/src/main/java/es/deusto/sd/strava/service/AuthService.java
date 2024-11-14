@@ -3,17 +3,13 @@ package es.deusto.sd.strava.service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 
-import es.deusto.sd.strava.dto.UsuarioDTO;
 import es.deusto.sd.strava.entity.Usuario;
 
 @Service
 public class AuthService {
-    private final AtomicInteger idUserGenerator = new AtomicInteger(0);
-
     // Simulating a Usuario repository
     private static Map<String, Usuario> UsuarioRepository = new HashMap<>();
     
@@ -80,10 +76,6 @@ public class AuthService {
     
 	public boolean isValidToken(String token) {
 		return tokenStore.containsKey(token);
-	}
-
-	public Usuario parseUsuarioDTO(UsuarioDTO user) {
-		return new Usuario(idUserGenerator.incrementAndGet(), user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo(), user.getServidorAuth());
 	}
 	
     // Synchronized method to guarantee unique token generation

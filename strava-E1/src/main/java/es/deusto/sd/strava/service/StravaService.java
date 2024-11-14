@@ -7,12 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.stereotype.Service;
 
-import es.deusto.sd.strava.dto.EntrenamientoDTO;
-import es.deusto.sd.strava.dto.RetoDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
 import es.deusto.sd.strava.entity.Reto;
 import es.deusto.sd.strava.entity.TipoDeporte;
@@ -21,22 +18,9 @@ import es.deusto.sd.strava.entity.TipoDeporte;
 public class StravaService {
 	
 	private Map<Integer, Reto> mapaRetos = new HashMap<>();
-    private final AtomicInteger idRetoGenerator = new AtomicInteger(0);
 	
 	public Map<Integer, Reto> getMapaRetos() {
 		return mapaRetos;
-	}
-
-	public Reto parseRetoDTO(RetoDTO dto) {
-		return new Reto(
-				idRetoGenerator.incrementAndGet(),
-				dto.getNombre(),
-				dto.getFechaInicio(),
-				dto.getFechaFin(),
-				dto.getObjetivo(),
-				dto.getTipoObjetivo(),
-				dto.getDeporte()
-			);
 	}
 	
 	public List<Reto> filtrarRetos(Map<Integer, Reto> retos, LocalDate fechaInicio, LocalDate fechaFin, TipoDeporte deporte) {
@@ -110,17 +94,6 @@ public class StravaService {
 
         return porcentajeReto;
     }
-
-	
-	public Entrenamiento parseEntrenamientoDTO(EntrenamientoDTO dto) {
-		return new Entrenamiento(
-            dto.getTitulo(),
-            dto.getDeporte(),
-            dto.getDistancia(),
-            dto.getFechaHora(),
-            dto.getDuracion()
-        );
-	}
 	
 	public List<Entrenamiento> filtrarEntrenamientos(List<Entrenamiento> entrenamientos, LocalDate fechaInicio, LocalDate fechaFin) {
 	    List<Entrenamiento> resultado = new ArrayList<>();

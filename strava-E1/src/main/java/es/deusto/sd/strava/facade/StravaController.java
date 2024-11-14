@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class StravaController {
 	private final AuthService authService;
 	private final StravaService stravaService;
+    private final AtomicInteger idRetoGenerator = new AtomicInteger(0);
 	
 	public StravaController(AuthService authService, StravaService stravaService) {
 		this.authService = authService;
@@ -85,7 +87,7 @@ public class StravaController {
 		if (u == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		u.addEntrenamiento(stravaService.parseEntrenamientoDTO(training));
+		u.addEntrenamiento(parseEntrenamientoDTO(training));
         return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -103,7 +105,7 @@ public class StravaController {
 		if (!authService.isValidToken(userToken)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
-		Reto reto = stravaService.parseRetoDTO(retoDTO);
+		Reto reto = parseRetoDTO(retoDTO);
 		stravaService.getMapaRetos().putIfAbsent(reto.getId(), reto);
         return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -175,4 +177,26 @@ public class StravaController {
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
+	// parse DTO to entity
+	public Entrenamiento parseEntrenamientoDTO(EntrenamientoDTO dto) {
+		return new Entrenamiento(
+            dto.getTitulo(),
+            dto.getDeporte(),
+            dto.getDistancia(),
+            dto.getFechaHora(),
+            dto.getDuracion()
+        );
+	}
+	
+	public Reto parseRetoDTO(RetoDTO dto) {
+		return new Reto(
+				idRetoGenerator.incrementAndGet(),
+				dto.getNombre(),
+				dto.getFechaInicio(),
+				dto.getFechaFin(),
+				dto.getObjetivo(),
+				dto.getTipoObjetivo(),
+				dto.getDeporte()
+			);
+	}
 }
