@@ -5,7 +5,6 @@
  */
 package es.deusto.sd.strava.entity;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -14,9 +13,9 @@ public class Usuario {
 	private int id;
 	private String email;
 	private String nombre;
-	private LocalDate fechaNacimiento;
+	private long fechaNacimiento;
 	private double peso;
-	private double altura;
+	private int altura;
 	private int frecuenciaCardiacaMax;
 	private int frecuenciaCardiacaReposo;
 	private ServidorAuth servidorAuth;
@@ -27,7 +26,7 @@ public class Usuario {
 	// Constructor without parameters
 	public Usuario() { }
 	
-	public Usuario(int id, String email, String nombre, LocalDate fechaNacimiento, double peso, double altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
+	public Usuario(int id, String email, String nombre, long fechaNacimiento, double peso, int altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
 		this.id = id;
 		this.email = email;
 		this.nombre = nombre;
@@ -61,11 +60,11 @@ public class Usuario {
 		this.nombre = nombre;
 	}
 
-	public LocalDate getFechaNacimiento() {
+	public long getFechaNacimiento() {
 		return fechaNacimiento;
 	}
 
-	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+	public void setFechaNacimiento(long fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 
@@ -77,11 +76,11 @@ public class Usuario {
 		this.peso = peso;
 	}
 
-	public double getAltura() {
+	public int getAltura() {
 		return altura;
 	}
 
-	public void setAltura(double altura) {
+	public void setAltura(int altura) {
 		this.altura = altura;
 	}
 
@@ -142,8 +141,7 @@ public class Usuario {
 		Usuario other = (Usuario) obj;
 		return Double.doubleToLongBits(altura) == Double.doubleToLongBits(other.altura)
 				&& Objects.equals(email, other.email) && Objects.equals(entrenamientos, other.entrenamientos)
-				&& Objects.equals(fechaNacimiento, other.fechaNacimiento)
-				&& frecuenciaCardiacaMax == other.frecuenciaCardiacaMax
+				&& fechaNacimiento == other.fechaNacimiento && frecuenciaCardiacaMax == other.frecuenciaCardiacaMax
 				&& frecuenciaCardiacaReposo == other.frecuenciaCardiacaReposo && id == other.id
 				&& Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(peso) == Double.doubleToLongBits(other.peso)

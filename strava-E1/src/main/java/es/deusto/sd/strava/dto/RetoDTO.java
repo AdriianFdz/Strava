@@ -1,7 +1,5 @@
 package es.deusto.sd.strava.dto;
 
-import java.time.LocalDate;
-
 import es.deusto.sd.strava.entity.TipoDeporte;
 import es.deusto.sd.strava.entity.TipoObjetivo;
 import jakarta.validation.constraints.NotNull;
@@ -10,9 +8,9 @@ public class RetoDTO {
 	@NotNull(message = "El nombre es obligatorio")
 	private String nombre;
 	@NotNull(message = "La fecha de inicio es obligatoria")
-	private LocalDate fechaInicio;
+	private long fechaInicio;
 	@NotNull(message = "La fecha de fin es obligatoria")
-	private LocalDate fechaFin;
+	private long fechaFin;
 	@NotNull(message = "El objetivo es obligatorio")
 	private double objetivo;
 	@NotNull(message = "El tipo de objetivo es obligatorio")
@@ -24,7 +22,7 @@ public class RetoDTO {
 	public RetoDTO() {}
 	
 	// Constructor con argumentos
-	public RetoDTO(String nombre, LocalDate fechaInicio, LocalDate fechaFin, double objetivo, TipoObjetivo tipoObjetivo, TipoDeporte deporte) {
+	public RetoDTO(String nombre, long fechaInicio, long fechaFin, double objetivo, TipoObjetivo tipoObjetivo, TipoDeporte deporte) {
 		super();
 		this.nombre = nombre;
 		this.fechaInicio = fechaInicio;
@@ -44,19 +42,19 @@ public class RetoDTO {
 		this.nombre = nombre;
 	}
 
-	public LocalDate getFechaInicio() {
+	public long getFechaInicio() {
 		return fechaInicio;
 	}
 
-	public void setFechaInicio(LocalDate fechaInicio) {
+	public void setFechaInicio(long fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 
-	public LocalDate getFechaFin() {
+	public long getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(LocalDate fechaFin) {
+	public void setFechaFin(long fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 

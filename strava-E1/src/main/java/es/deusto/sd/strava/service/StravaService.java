@@ -1,8 +1,5 @@
 package es.deusto.sd.strava.service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,48 +20,18 @@ public class StravaService {
 		return mapaRetos;
 	}
 	
-	public List<Reto> filtrarRetos(Map<Integer, Reto> retos, LocalDate fechaInicio, LocalDate fechaFin, TipoDeporte deporte) {
+	public List<Reto> filtrarRetos(Map<Integer, Reto> retos, Long fechaInicio, Long fechaFin, TipoDeporte deporte) {
 	    List<Reto> resultado = new ArrayList<>();
-
 	    for (Reto reto : retos.values()) {
-	        if (fechaInicio != null && fechaFin != null && deporte != null) {
-	            if ((!reto.getFechaInicio().isBefore(fechaInicio)) && (!reto.getFechaInicio().isAfter(fechaFin)) && reto.getDeporte().equals(deporte)) {
-	                resultado.add(reto);
-	            }
-	        }
-	        else if (fechaInicio != null && deporte != null) {
-	            if (!reto.getFechaInicio().isBefore(fechaInicio) && reto.getDeporte().equals(deporte)) {
-	                resultado.add(reto);
-	            }
-	        }
-	        else if (fechaFin != null &&  deporte != null) {
-	            if (!reto.getFechaInicio().isAfter(fechaFin) && reto.getDeporte().equals(deporte)) {
-	                resultado.add(reto);
-	            }
-	        }
-	    	
-	        else if (fechaInicio != null && fechaFin != null) {
-	            if ((!reto.getFechaInicio().isBefore(fechaInicio)) && (!reto.getFechaInicio().isAfter(fechaFin))) {
-	                resultado.add(reto);
-	            }
-	        }
-	        else if (fechaInicio != null) {
-	            if (!reto.getFechaInicio().isBefore(fechaInicio)) {
-	                resultado.add(reto);
-	            }
-	        }
-	        else if (fechaFin != null) {
-	            if (!reto.getFechaInicio().isAfter(fechaFin)) {
-	                resultado.add(reto);
-	            }
-	        } 
-	        else if (deporte != null) {
-            	if (reto.getDeporte().equals(deporte)) {
-            		resultado.add(reto);
-            	}
-	    }
+	        boolean cumpleFechaInicio = (fechaInicio == null || reto.getFechaInicio() >= fechaInicio);
+	        boolean cumpleFechaFin = (fechaFin == null || reto.getFechaFin() <= fechaFin);
+	        boolean cumpleDeporte = (deporte == null || reto.getDeporte().equals(deporte));
 	        
+	        if (cumpleFechaInicio && cumpleFechaFin && cumpleDeporte) {
+	            resultado.add(reto);
+	        }
 	    }
+	    
 	    return resultado;
 	}
 	
@@ -77,7 +44,7 @@ public class StravaService {
         		if (reto.getDeporte() != entrenamiento.getDeporte()) {
 					continue;
 				}
-				if (!reto.getFechaInicio().isAfter(timeStampToLocalDate(entrenamiento.getFechaHora())) && !reto.getFechaFin().isBefore(timeStampToLocalDate(entrenamiento.getFechaHora()))) {
+				if (reto.getFechaInicio() <= entrenamiento.getFechaHora() && reto.getFechaFin() >= entrenamiento.getFechaHora()){
 					switch(reto.getTipoObjetivo()) {
                         case DISTANCIA:
                             resultado += entrenamiento.getDistancia();
@@ -95,31 +62,28 @@ public class StravaService {
         return porcentajeReto;
     }
 	
-	public List<Entrenamiento> filtrarEntrenamientos(List<Entrenamiento> entrenamientos, LocalDate fechaInicio, LocalDate fechaFin) {
+	public List<Entrenamiento> filtrarEntrenamientos(List<Entrenamiento> entrenamientos, Long fechaInicio, Long fechaFin) {
 	    List<Entrenamiento> resultado = new ArrayList<>();
 
 	    for (Entrenamiento entrenamiento : entrenamientos) {
 	        if (fechaInicio != null && fechaFin != null) {
-	            if ((!timeStampToLocalDate(entrenamiento.getFechaHora()).isBefore(fechaInicio)) && (!timeStampToLocalDate(entrenamiento.getFechaHora()).isAfter(fechaFin))) {
-	                resultado.add(entrenamiento);
-	            }
+	        	if (entrenamiento.getFechaHora() >= fechaInicio && entrenamiento.getFechaHora() <= fechaFin) {
+            		resultado.add(entrenamiento);
+	        	}
 	        }
 	        else if (fechaInicio != null) {
-	            if (!timeStampToLocalDate(entrenamiento.getFechaHora()).isBefore(fechaInicio)) {
-	                resultado.add(entrenamiento);
-	            }
+	        	if (entrenamiento.getFechaHora() >= fechaInicio) {
+            		resultado.add(entrenamiento);
+            	}
+					
 	        }
 	        else if (fechaFin != null) {
-	            if (!timeStampToLocalDate(entrenamiento.getFechaHora()).isAfter(fechaFin)) {
-	                resultado.add(entrenamiento);
-	            }
+				if (entrenamiento.getFechaHora() <= fechaFin) {
+					resultado.add(entrenamiento);
+				}
 	        }
 	    }
 
 	    return resultado;
-	}
-	
-	public LocalDate timeStampToLocalDate(long timestamp) {
-		return Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate();
 	}
 }

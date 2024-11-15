@@ -1,7 +1,5 @@
 package es.deusto.sd.strava.dto;
 
-import java.time.LocalDate;
-
 import es.deusto.sd.strava.entity.ServidorAuth;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,14 +12,14 @@ public class UsuarioDTO {
     private String nombre;
 
     @NotNull(message = "La fecha de nacimiento es obligatoria")
-    private LocalDate fechaNacimiento;
+    private long fechaNacimiento;
     
     @NotNull(message = "El servidor de autenticación es obligatorio")
     private ServidorAuth servidorAuth;
     
     // Campos opcionales
     private double peso;
-    private double altura;
+    private int altura;
     private int frecuenciaCardiacaMax;
     private int frecuenciaCardiacaReposo;
 
@@ -29,7 +27,7 @@ public class UsuarioDTO {
 	public UsuarioDTO() {}
     
     //Constructor con argumentos
-	public UsuarioDTO(String email, String nombre, LocalDate fechaNacimiento, Double peso, Integer altura,
+	public UsuarioDTO(String email, String nombre, long fechaNacimiento, double peso, int altura,
 			int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
 		this.email = email;
 		this.nombre = nombre;
@@ -54,10 +52,10 @@ public class UsuarioDTO {
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
-	public LocalDate getFechaNacimiento() {
+	public long getFechaNacimiento() {
 		return fechaNacimiento;
 	}
-	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+	public void setFechaNacimiento(long fechaNacimiento) {
 		this.fechaNacimiento = fechaNacimiento;
 	}
 	public Double getPeso() {
@@ -66,10 +64,10 @@ public class UsuarioDTO {
 	public void setPeso(Double peso) {
 		this.peso = peso;
 	}
-	public double getAltura() {
+	public int getAltura() {
 		return altura;
 	}
-	public void setAltura(double altura) {
+	public void setAltura(int altura) {
 		this.altura = altura;
 	}
 	public int getFrecuenciaCardiacaMax() {

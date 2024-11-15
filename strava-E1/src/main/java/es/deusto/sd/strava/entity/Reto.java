@@ -1,6 +1,5 @@
 package es.deusto.sd.strava.entity;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -8,19 +7,19 @@ import java.util.Objects;
 public class Reto {
 	private int id;
 	private String nombre;
-	private LocalDate fechaInicio;
-	private LocalDate fechaFin;
+	private long fechaInicio;
+	private long fechaFin;
 	private double objetivo;
 	private TipoObjetivo tipoObjetivo;
 	private TipoDeporte deporte;
 	
-	private List<Usuario> participantes = new ArrayList<>();
+	private List<Integer> participantes = new ArrayList<>();
 	
 	// Constructor without parameters
 	public Reto() { }
 
 	// Constructor with parameters
-	public Reto(int id, String nombre, LocalDate fechaInicio, LocalDate fechaFin, double objetivo, TipoObjetivo tipoObjetivo,
+	public Reto(int id, String nombre, long fechaInicio, long fechaFin, double objetivo, TipoObjetivo tipoObjetivo,
 			TipoDeporte deporte) {
 		super();
 		this.id = id;
@@ -45,19 +44,19 @@ public class Reto {
 		this.nombre = nombre;
 	}
 
-	public LocalDate getFechaInicio() {
+	public long getFechaInicio() {
 		return fechaInicio;
 	}
 
-	public void setFechaInicio(LocalDate fechaInicio) {
+	public void setFechaInicio(long fechaInicio) {
 		this.fechaInicio = fechaInicio;
 	}
 
-	public LocalDate getFechaFin() {
+	public long getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(LocalDate fechaFin) {
+	public void setFechaFin(long fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 	
@@ -86,12 +85,12 @@ public class Reto {
 	}
 
 	
-	public List<Usuario> getParticipantes() {
+	public List<Integer> getParticipantes() {
 		return participantes;
 	}
 
-	public void addParticipantes(Usuario participante) {
-		this.participantes.add(participante);
+	public void addParticipantes(int idParticipante) {
+		this.participantes.add(idParticipante);
 	}
 
 	@Override
@@ -108,9 +107,8 @@ public class Reto {
 		if (getClass() != obj.getClass())
 			return false;
 		Reto other = (Reto) obj;
-		return deporte == other.deporte && Objects.equals(fechaFin, other.fechaFin)
-				&& Objects.equals(fechaInicio, other.fechaInicio) && id == other.id
-				&& Objects.equals(nombre, other.nombre)
+		return deporte == other.deporte && fechaFin == other.fechaFin && fechaInicio == other.fechaInicio
+				&& id == other.id && Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(objetivo) == Double.doubleToLongBits(other.objetivo)
 				&& Objects.equals(participantes, other.participantes) && tipoObjetivo == other.tipoObjetivo;
 	}

@@ -1,6 +1,5 @@
 package es.deusto.sd.strava.facade;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,9 +53,9 @@ public class StravaController {
 		@Parameter(name = "userID", description = "The id of a registered user", required = true, example = "1")
 		@PathVariable("userID") int userID,
 		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
-		@RequestParam(required = false, name = "FechaInicio") LocalDate fechaInicio, 
+		@RequestParam(required = false, name = "FechaInicio") Long fechaInicio, 
 		@Parameter(name = "FechaFin", description = "The end date to filter the trainings", required = false)
-		@RequestParam(required = false, name = "FechaFin") LocalDate fechaFin){
+		@RequestParam(required = false, name = "FechaFin") Long fechaFin){
 		Usuario u = authService.getUsuarioByID(userID, userToken);
 		if (u == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
@@ -121,9 +119,9 @@ public class StravaController {
 		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
 		@RequestParam("userToken") String userToken,
 		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
-		@RequestParam(required = false, name = "FechaInicio") LocalDate fechaInicio, 
+		@RequestParam(required = false, name = "FechaInicio") Long fechaInicio, 
 		@Parameter(name = "FechaFin", description = "The end date to filter the trainings", required = false)
-		@RequestParam(required = false, name = "FechaFin") LocalDate fechaFin,
+		@RequestParam(required = false, name = "FechaFin") Long fechaFin,
 	    @Parameter(name = "Deporte", description = "Type of sport", required = false)
 	    @RequestParam(required = false, name = "Deporte") TipoDeporte deporte){
 		if (!authService.isValidToken(userToken)) {
@@ -161,7 +159,7 @@ public class StravaController {
             @ApiResponse(responseCode = "200", description = "Success: Challenge accepted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
-	@PutMapping("users/{userID}/challenges/{idReto}")
+	@PostMapping("users/{userID}/challenges/{idReto}")
 	public ResponseEntity<HttpStatus> acceptChallenge(
 			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
 			@RequestParam(required = true, name = "userToken") String userToken,
@@ -174,6 +172,7 @@ public class StravaController {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		u.addRetosAceptados(stravaService.getMapaRetos().get(idReto));
+		stravaService.getMapaRetos().get(idReto).addParticipantes(u.getId());
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
