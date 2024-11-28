@@ -4,15 +4,49 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
+
+@Entity
+@Table(name = "Reto")
 public class Reto {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
+	@Column(nullable = false)
 	private String nombre;
+	
+	@Column(nullable = false)
 	private long fechaInicio;
+	
+	@Column(nullable = false)
 	private long fechaFin;
+	
+	@Column(nullable = false)
 	private double objetivo;
+	
+	@Enumerated(EnumType.STRING)
 	private TipoObjetivo tipoObjetivo;
+	
+	@Enumerated(EnumType.STRING)
 	private TipoDeporte deporte;
 	
+    @ElementCollection
+    @CollectionTable(name = "participantes_Reto", joinColumns = @JoinColumn(name = "id"))
+    @Column(name = "participante")
 	private List<Integer> participantes = new ArrayList<>();
 	
 	// Constructor without parameters

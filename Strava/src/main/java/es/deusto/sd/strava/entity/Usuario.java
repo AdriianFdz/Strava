@@ -9,18 +9,53 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "Usuario")
 public class Usuario {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	@Column(nullable = false, unique = true)
 	private String email;
+	
+	@Column(nullable = false)
 	private String nombre;
+	
+	@Column(nullable = false)
 	private long fechaNacimiento;
+	
+	@Column
 	private double peso;
+	
+	@Column
 	private int altura;
+	
+	@Column
 	private int frecuenciaCardiacaMax;
+	
+	@Column
 	private int frecuenciaCardiacaReposo;
+	
+	@Enumerated(EnumType.STRING)
 	private ServidorAuth servidorAuth;
 	
+	@OneToMany(mappedBy = "titulo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Entrenamiento> entrenamientos = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "nombre", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Reto> retosAceptados = new ArrayList<>();
 	
 	// Constructor without parameters

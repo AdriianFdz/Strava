@@ -2,11 +2,30 @@ package es.deusto.sd.strava.entity;
 
 import java.util.Objects;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "Entrenamiento")
 public class Entrenamiento {
+	@Column(nullable = false)
 	private String titulo;
+	
+	@Enumerated(EnumType.STRING)
 	private TipoDeporte deporte;
+	
+	@Column(nullable = false)
 	private double distancia;
+	
+	@Id
+	@Column(nullable = false)
 	private long fechaHora;
+	
+	@Column(nullable = false)
 	private int duracion;
 	
 	// Constructor without parameters
