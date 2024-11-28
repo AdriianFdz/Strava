@@ -10,7 +10,10 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+
+import es.deusto.sd.strava.entity.ServidorAuth;
 
 
 @Component
@@ -29,15 +32,16 @@ public class GoogleServiceGateway implements ILoginServiceGateway{
         
         //entidad http
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
-        
-        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {}); //map.class ult parametro
-        // Verificamos si la respuesta tiene el código de estado OK
-        if (response.getStatusCode() == HttpStatus.OK) {
-            // Si el código es OK, devolvemos true
-            return true;
-        } else {
-            // Si el código no es OK (401 Unauthorized), devolvemos false
-            return false;
-        }
+        try {
+        	restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {}); //map.class ult parametro			
+		} catch (Exception e) {
+			return false;
+		}
+        return true;
+	}
+
+	@Override
+	public ServidorAuth getServidorAuth() {
+		return ServidorAuth.GOOGLE;
 	}
 }
