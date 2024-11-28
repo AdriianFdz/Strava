@@ -20,6 +20,7 @@ import es.deusto.sd.strava.dto.CredencialesDTO;
 import es.deusto.sd.strava.dto.UsuarioDTO;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.service.AuthService;
+import es.deusto.sd.strava.service.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -30,12 +31,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authorization Controller", description = "Login and logout operations")
 public class AuthController {
 
-    private AuthService authService;
+    private final AuthService authService;
+    private final LoginService loginService;
     private final AtomicInteger idUserGenerator = new AtomicInteger(0);
 
     
-	public AuthController(AuthService authService) {
+	public AuthController(AuthService authService, LoginService loginService) {
 		this.authService = authService;
+		this.loginService = loginService;
 	}
     
 	// Register endpoint
@@ -65,13 +68,15 @@ public class AuthController {
     public ResponseEntity<String> login(
     		@Parameter(name = "credentials", description = "User's credentials", required = true)    	
     		@RequestBody CredencialesDTO credentials) {    	
-        Optional<String> token = authService.login(credentials.getEmail(), credentials.getPassword());
-        
-    	if (token.isPresent()) {
-    		return new ResponseEntity<>(token.get(), HttpStatus.OK);
-    	} else {
-    		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-    	}
+    	
+    	boolean isOk = loginService.login(credentials.getEmail(), credentials.getPassword());
+    	        
+    	
+    	if (isOk) {
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+    	return new ResponseEntity<>("Invalid credentials", HttpStatus.UNAUTHORIZED);
+
     }
 
     // Logout endpoint
