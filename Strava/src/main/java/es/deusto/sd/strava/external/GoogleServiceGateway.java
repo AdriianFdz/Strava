@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 @Component
-public class LoginServiceGateway implements ILoginServiceGateway{
+public class GoogleServiceGateway implements ILoginServiceGateway{
 	private final String API_URL = "http://localhost:8081/auth/login";
 	
 	public boolean login(String email, String password) {

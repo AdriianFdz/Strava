@@ -16,31 +16,31 @@ public class AuthService {
     // Storage to keep the session of the Usuarios that are logged in
     private static Map<String, Usuario> tokenStore = new HashMap<>(); 
 
-    // Login method that checks if the Usuario exists in the database and validates the password
-    public Optional<String> login(String email, String password) {
-        Usuario Usuario = UsuarioRepository.get(email);
-        
-        if (Usuario != null) {
-//        	switch (Usuario.getServidorAuth()) {
-//				case GOOGLE:
-//					// Check if the password is correct
-//					
-//					break;
-//				case META:
-//					// Check if the password is correct
-//					
-//					break;
-//        	}
-        	
-        	// Si es correcta
-            String token = generateToken();  // Generate a random token for the session
-            tokenStore.put(token, Usuario);     // Store the token and associate it with the Usuario
-
-            return Optional.of(token);
-        } else {
-        	return Optional.empty();
-        }
-    }
+//    // Login method that checks if the Usuario exists in the database and validates the password
+//    public Optional<String> login(String email, String password) {
+//        Usuario Usuario = UsuarioRepository.get(email);
+//        
+//        if (Usuario != null) {
+////        	switch (Usuario.getServidorAuth()) {
+////				case GOOGLE:
+////					// Check if the password is correct
+////					
+////					break;
+////				case META:
+////					// Check if the password is correct
+////					
+////					break;
+////        	}
+//        	
+//        	// Si es correcta
+//            String token = generateToken();  // Generate a random token for the session
+//            tokenStore.put(token, Usuario);     // Store the token and associate it with the Usuario
+//
+//            return Optional.of(token);
+//        } else {
+//        	return Optional.empty();
+//        }
+//    }
     
     // Logout method to remove the token from the session store
     public Optional<Boolean> logout(String token) {
