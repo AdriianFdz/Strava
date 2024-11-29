@@ -27,12 +27,10 @@ public class AuthService {
     public Optional<String> login(String email, String password) {
     	
     	Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
-    	if (usuario.isPresent()) {
-    		if (loginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password)) {
-    			String token = generateToken();  // Generate a random token for the session
-    			tokenStore.put(token, usuario.get());     // Store the token and associate it with the Usuario
-    			return Optional.of(token);
-    		}    		
+		if (usuario.isPresent() && loginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password)) {
+			String token = generateToken();  // Generate a random token for the session
+			tokenStore.put(token, usuario.get());     // Store the token and associate it with the Usuario
+			return Optional.of(token); 		
 		}	
     	return Optional.empty();
     }
