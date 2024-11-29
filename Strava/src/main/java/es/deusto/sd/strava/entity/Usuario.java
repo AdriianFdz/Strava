@@ -18,7 +18,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,7 +30,7 @@ public class Usuario {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	@Column(nullable = false, unique = true)
 	private String email;
 	
@@ -52,16 +55,19 @@ public class Usuario {
 	@Enumerated(EnumType.STRING)
 	private ServidorAuth servidorAuth;
 	
-	@OneToMany(mappedBy = "titulo", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<Entrenamiento> entrenamientos = new ArrayList<>();
 	
-	@OneToMany(mappedBy = "nombre", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "usuario_reto",
+	joinColumns = @JoinColumn(name = "usuario_id"),
+	inverseJoinColumns = @JoinColumn(name = "reto_id"))
 	private List<Reto> retosAceptados = new ArrayList<>();
 	
 	// Constructor without parameters
 	public Usuario() { }
 	
-	public Usuario(int id, String email, String nombre, long fechaNacimiento, double peso, int altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
+	public Usuario(Integer id, String email, String nombre, long fechaNacimiento, double peso, int altura, int frecuenciaCardiacaMax, int frecuenciaCardiacaReposo, ServidorAuth servidorAuth) {
 		this.id = id;
 		this.email = email;
 		this.nombre = nombre;
@@ -161,8 +167,7 @@ public class Usuario {
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(altura, email, entrenamientos, fechaNacimiento, frecuenciaCardiacaMax,
-				frecuenciaCardiacaReposo, id, nombre, peso, retosAceptados, servidorAuth);
+		return Objects.hash(id);
 	}
 
 	@Override
@@ -174,13 +179,7 @@ public class Usuario {
 		if (getClass() != obj.getClass())
 			return false;
 		Usuario other = (Usuario) obj;
-		return Double.doubleToLongBits(altura) == Double.doubleToLongBits(other.altura)
-				&& Objects.equals(email, other.email) && Objects.equals(entrenamientos, other.entrenamientos)
-				&& fechaNacimiento == other.fechaNacimiento && frecuenciaCardiacaMax == other.frecuenciaCardiacaMax
-				&& frecuenciaCardiacaReposo == other.frecuenciaCardiacaReposo && id == other.id
-				&& Objects.equals(nombre, other.nombre)
-				&& Double.doubleToLongBits(peso) == Double.doubleToLongBits(other.peso)
-				&& Objects.equals(retosAceptados, other.retosAceptados) && servidorAuth == other.servidorAuth;
+		return Objects.equals(id, other.id);
 	}	
 	
 	

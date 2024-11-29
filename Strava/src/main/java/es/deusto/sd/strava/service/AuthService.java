@@ -30,7 +30,7 @@ public class AuthService {
 		if (usuario.isPresent() && loginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password)) {
 			String token = generateToken();  // Generate a random token for the session
 			tokenStore.put(token, usuario.get());     // Store the token and associate it with the Usuario
-			return Optional.of(token); 		
+			return Optional.of(token);
 		}	
     	return Optional.empty();
     }
@@ -53,20 +53,10 @@ public class AuthService {
     	}
     }
     
-    // Method to get the Usuario based on the token
-	public Usuario getUsuarioByToken(String token) {
-		return tokenStore.get(token) != null ? tokenStore.get(token) : null;
+	public boolean isValidTokenWithUser(String token, Usuario u) {
+		return tokenStore.containsKey(token) && tokenStore.get(token).equals(u);
 	}
-    
-    // Method to get the Usuario based on the ID and token
-	public Usuario getUsuarioByID(int id, String token) {
-		Usuario u = tokenStore.get(token);
-		if (u != null && u.getId() == id) {
-			return u;
-		}
-		return null;
-	}
-    
+	
 	public boolean isValidToken(String token) {
 		return tokenStore.containsKey(token);
 	}
