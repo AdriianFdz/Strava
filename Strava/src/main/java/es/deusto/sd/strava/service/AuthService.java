@@ -4,11 +4,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import es.deusto.sd.strava.dao.UsuarioRepository;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.external.LoginGatewayFactory;
+import jakarta.validation.constraints.Null;
 
 @Service
 public class AuthService {
@@ -24,15 +28,24 @@ public class AuthService {
     
     
     // Login method that checks if the Usuario exists in the database and validates the password
-    public Optional<String> login(String email, String password) {
-    	
+    public Optional<String> login(String email, String password) {	
     	Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
-		if (usuario.isPresent() && loginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password)) {
+    	if (usuario.isEmpty()) {
+    		return Optional.of("Invalid email");			
+		}
+    	
+    	ResponseEntity<String> resultado = loginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password);
+
+    	if (resultado.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
+    		return Optional.of("Invalid password");
+    	}
+    	
+		if(resultado.getStatusCode().isSameCodeAs(HttpStatus.OK)) {
 			String token = generateToken();  // Generate a random token for the session
 			tokenStore.put(token, usuario.get());     // Store the token and associate it with the Usuario
 			return Optional.of(token);
-		}	
-    	return Optional.empty();
+		}
+		return Optional.of("Internal Server Error");
     }
     
     // Logout method to remove the token from the session store
