@@ -23,7 +23,7 @@ dependencies {
 }
 
 application {
-    mainClass = 'es.deusto.ingenieria.sd.Meta'
+    mainClass = 'es.deusto.ingenieria.sd.AuthServer'
 }
 
 // Server port
