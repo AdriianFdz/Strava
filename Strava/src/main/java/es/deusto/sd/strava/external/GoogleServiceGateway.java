@@ -11,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpClientErrorException.Unauthorized;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import es.deusto.sd.strava.entity.ServidorAuth;
@@ -20,7 +22,7 @@ import es.deusto.sd.strava.entity.ServidorAuth;
 public class GoogleServiceGateway implements ILoginServiceGateway{
 	private final String API_URL = "http://localhost:8081/auth/login";
 	
-	public boolean login(String email, String password) {
+	public ResponseEntity<String> login(String email, String password) {
 		
 		//template
 		RestTemplate restTemplate = new RestTemplate();
@@ -32,12 +34,24 @@ public class GoogleServiceGateway implements ILoginServiceGateway{
         
         //entidad http
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(requestBody, headers);
+    	
         try {
-        	restTemplate.exchange(API_URL, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {}); //map.class ult parametro			
-		} catch (Exception e) {
-			return false;
+            restTemplate.exchange(
+                    API_URL,
+                    HttpMethod.POST,
+                    requestEntity,
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
+
+        } catch (HttpClientErrorException.Unauthorized e) {
+        	return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        } catch (HttpClientErrorException.NotFound ex) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		} catch (RestClientException e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-        return true;
+
+        return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@Override

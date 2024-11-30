@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,16 +12,15 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 @Table(name = "Reto")
 public class Reto {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int id;
+	private Integer id;
 	
 	@Column(nullable = false)
 	private String nombre;
@@ -44,16 +40,15 @@ public class Reto {
 	@Enumerated(EnumType.STRING)
 	private TipoDeporte deporte;
 	
-    @ElementCollection
-    @CollectionTable(name = "participantes_Reto", joinColumns = @JoinColumn(name = "id"))
-    @Column(name = "participante")
-	private List<Integer> participantes = new ArrayList<>();
+	
+    @ManyToMany(mappedBy = "retosAceptados", fetch = FetchType.EAGER)
+	private List<Usuario> participantes = new ArrayList<>();
 	
 	// Constructor without parameters
 	public Reto() { }
 
 	// Constructor with parameters
-	public Reto(int id, String nombre, long fechaInicio, long fechaFin, double objetivo, TipoObjetivo tipoObjetivo,
+	public Reto(Integer id, String nombre, long fechaInicio, long fechaFin, double objetivo, TipoObjetivo tipoObjetivo,
 			TipoDeporte deporte) {
 		super();
 		this.id = id;
@@ -66,7 +61,7 @@ public class Reto {
 	}
 
 	// Getters and Setters
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 	
@@ -119,12 +114,12 @@ public class Reto {
 	}
 
 	
-	public List<Integer> getParticipantes() {
+	public List<Usuario> getParticipantes() {
 		return participantes;
 	}
 
-	public void addParticipantes(int idParticipante) {
-		this.participantes.add(idParticipante);
+	public void addParticipantes(Usuario participante) {
+		this.participantes.add(participante);
 	}
 
 	@Override
@@ -142,7 +137,7 @@ public class Reto {
 			return false;
 		Reto other = (Reto) obj;
 		return deporte == other.deporte && fechaFin == other.fechaFin && fechaInicio == other.fechaInicio
-				&& id == other.id && Objects.equals(nombre, other.nombre)
+				&& Objects.equals(id, other.id) && Objects.equals(nombre, other.nombre)
 				&& Double.doubleToLongBits(objetivo) == Double.doubleToLongBits(other.objetivo)
 				&& Objects.equals(participantes, other.participantes) && tipoObjetivo == other.tipoObjetivo;
 	}

@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,16 +30,21 @@ public class Entrenamiento {
 	@Column(nullable = false)
 	private int duracion;
 	
+	@ManyToOne
+	@JoinColumn(name = "usuario_id")
+	private Usuario usuario;
+	
 	// Constructor without parameters
 	public Entrenamiento() { }
 	
 	// Constructor with parameters
-	public Entrenamiento(String titulo, TipoDeporte deporte, double distancia, long fechaHora, int duracion) {
+	public Entrenamiento(String titulo, TipoDeporte deporte, double distancia, long fechaHora, int duracion, Usuario usuario) {
 		this.titulo = titulo;
 		this.deporte = deporte;
 		this.distancia = distancia;
 		this.fechaHora = fechaHora;
 		this.duracion = duracion;
+		this.usuario = usuario;
 	}
 
 	// Getters and Setters
@@ -82,11 +89,13 @@ public class Entrenamiento {
 		this.duracion = duracion;
 	}
 
-	// HashCode and Equals
+	public Usuario getUsuario() {
+		return usuario;
+	}	
 	
 	@Override
 	public int hashCode() {
-		return Objects.hash(deporte, distancia, duracion, fechaHora, titulo);
+		return Objects.hash(deporte, distancia, duracion, fechaHora, titulo, usuario);
 	}
 
 	@Override
@@ -100,8 +109,7 @@ public class Entrenamiento {
 		Entrenamiento other = (Entrenamiento) obj;
 		return deporte == other.deporte
 				&& Double.doubleToLongBits(distancia) == Double.doubleToLongBits(other.distancia)
-				&& duracion == other.duracion && fechaHora == other.fechaHora && Objects.equals(titulo, other.titulo);
+				&& duracion == other.duracion && fechaHora == other.fechaHora && Objects.equals(titulo, other.titulo)
+				&& Objects.equals(usuario, other.usuario);
 	}	
-	
-	
 }
