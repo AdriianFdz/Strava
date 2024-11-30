@@ -50,7 +50,8 @@ public class AuthController {
 				return new ResponseEntity<>("Invalid password", HttpStatus.UNAUTHORIZED);
 			}
     	} else {
-    		return new ResponseEntity<>("Invalid email", HttpStatus.UNAUTHORIZED);    	}
+    		return new ResponseEntity<>("Invalid email", HttpStatus.NOT_FOUND); 
+		}
     }	
     
 	public Credentials parseCredentialsDTO(CredentialsDTO credencials) {
