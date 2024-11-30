@@ -5,19 +5,16 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import es.deusto.sd.strava.dao.UsuarioRepository;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.external.LoginGatewayFactory;
-import jakarta.validation.constraints.Null;
 
 @Service
 public class AuthService {
     private final UsuarioRepository usuarioRepository;
-    LoginGatewayFactory loginGatewayFactory = new LoginGatewayFactory();
     
     // Storage to keep the session of the Usuarios that are logged in
     private static Map<String, Usuario> tokenStore = new HashMap<>(); 
@@ -34,7 +31,7 @@ public class AuthService {
     		return Optional.of("Invalid email");			
 		}
     	
-    	ResponseEntity<String> resultado = loginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password);
+    	ResponseEntity<String> resultado = LoginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password);
 
     	if (resultado.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
     		return Optional.of("Invalid password");
@@ -60,10 +57,12 @@ public class AuthService {
     }
     
     // Method to add a new Usuario to the repository
-    public void register(Usuario Usuario) {
-    	if (Usuario != null) {
+    public boolean register(Usuario Usuario) {
+    	if (Usuario != null && !usuarioRepository.existsByEmail(Usuario.getEmail())) {
     		usuarioRepository.save(Usuario);
+    		return true;
     	}
+    	return false;
     }
     
 	public boolean isValidTokenWithUser(String token, Usuario u) {

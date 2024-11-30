@@ -2,8 +2,8 @@ package es.deusto.sd.strava.external;
 
 import es.deusto.sd.strava.entity.ServidorAuth;
 
-public class LoginGatewayFactory {	
-	public ILoginServiceGateway getLoginServiceGateway(ServidorAuth servidor) {
+public abstract class LoginGatewayFactory {	
+	public static ILoginServiceGateway getLoginServiceGateway(ServidorAuth servidor) {
 		switch (servidor) {
 		case GOOGLE:
 			return new GoogleServiceGateway();

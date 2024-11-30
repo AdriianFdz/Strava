@@ -6,7 +6,6 @@
 package es.deusto.sd.strava.facade;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +30,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AuthController {
 
     private final AuthService authService;
-    private final AtomicInteger idUserGenerator = new AtomicInteger(0);
-
     
 	public AuthController(AuthService authService) {
 		this.authService = authService;
@@ -41,14 +38,17 @@ public class AuthController {
 	// Register endpoint
 	@Operation(summary = "Register a new user", description = "Allows a user to register by providing the user's details.", responses = {
 			@ApiResponse(responseCode = "201", description = "Created: User registered successfully"),
-			@ApiResponse(responseCode = "400", description = "Bad Request: Invalid user details"), })
+			@ApiResponse(responseCode = "400", description = "Bad Request: Invalid user details or the user exists"), })
 	@PostMapping("/register")
 	public ResponseEntity<Void> register(
 			@Parameter(name = "user", description = "User's details", required = true) 
 			@RequestBody UsuarioDTO user) {
 		
 		Usuario u = parseUsuarioDTO(user);
-		authService.register(u);
+		boolean resultado = authService.register(u);
+		if (!resultado) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 		
 	}
