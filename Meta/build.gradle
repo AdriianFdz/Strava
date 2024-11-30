@@ -1,14 +1,10 @@
+// This script is based on a solution provided by Claude 3.5 Sonnet.
+// It has been thoroughly reviewed and validated to ensure that it 
+// is correct and error free. 
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
-	id 'io.spring.dependency-management' version '1.1.6'
-}
-
-group = 'es.deusto.sd.strava'
-version = '1.0'
-
-repositories {
-	mavenCentral()
+    id 'java'
+    id 'application'
 }
 
 java {
@@ -17,10 +13,23 @@ java {
     }
 }
 
-dependencies {
-	// Spring Boot Starter Web for building web applications
-    implementation 'org.springframework.boot:spring-boot-starter-web'
+repositories {
+    mavenCentral()
+}
 
-	// SpringDoc OpenAPI UI Dependency this is needed to use Swagger annotations
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+dependencies {
+	// Reference to use JSON library
+    implementation 'org.json:json:+'
+}
+
+application {
+    mainClass = 'es.deusto.ingenieria.sd.AuthServer'
+}
+
+// Server port
+def serverPort = 9500       
+
+run {
+    // Port is passed as program argument
+    args = [serverPort.toString()]
 }

@@ -4,42 +4,45 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import es.deusto.sd.strava.dao.UsuarioRepository;
 import es.deusto.sd.strava.entity.Usuario;
+import es.deusto.sd.strava.external.LoginGatewayFactory;
 
 @Service
 public class AuthService {
-    // Simulating a Usuario repository
-    private static Map<String, Usuario> UsuarioRepository = new HashMap<>();
+    private final UsuarioRepository usuarioRepository;
     
     // Storage to keep the session of the Usuarios that are logged in
     private static Map<String, Usuario> tokenStore = new HashMap<>(); 
 
+	public AuthService(UsuarioRepository usuarioRepository) {
+        this.usuarioRepository = usuarioRepository;
+    }
+    
+    
     // Login method that checks if the Usuario exists in the database and validates the password
-    public Optional<String> login(String email, String password) {
-        Usuario Usuario = UsuarioRepository.get(email);
-        
-        if (Usuario != null) {
-//        	switch (Usuario.getServidorAuth()) {
-//				case GOOGLE:
-//					// Check if the password is correct
-//					
-//					break;
-//				case META:
-//					// Check if the password is correct
-//					
-//					break;
-//        	}
-        	
-        	// Si es correcta
-            String token = generateToken();  // Generate a random token for the session
-            tokenStore.put(token, Usuario);     // Store the token and associate it with the Usuario
+    public Optional<String> login(String email, String password) {	
+    	Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+    	if (usuario.isEmpty()) {
+    		return Optional.of("Invalid email");			
+		}
+    	
+    	ResponseEntity<String> resultado = LoginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password);
 
-            return Optional.of(token);
-        } else {
-        	return Optional.empty();
-        }
+    	if (resultado.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
+    		return Optional.of("Invalid password");
+    	}
+    	
+		if(resultado.getStatusCode().isSameCodeAs(HttpStatus.OK)) {
+			String token = generateToken();  // Generate a random token for the session
+			tokenStore.put(token, usuario.get());     // Store the token and associate it with the Usuario
+			return Optional.of(token);
+		}
+		return Optional.of("Internal Server Error");
     }
     
     // Logout method to remove the token from the session store
@@ -54,26 +57,18 @@ public class AuthService {
     }
     
     // Method to add a new Usuario to the repository
-    public void register(Usuario Usuario) {
-    	if (Usuario != null) {
-    		UsuarioRepository.putIfAbsent(Usuario.getEmail(), Usuario);
+    public boolean register(Usuario Usuario) {
+    	if (Usuario != null && !usuarioRepository.existsByEmail(Usuario.getEmail())) {
+    		usuarioRepository.save(Usuario);
+    		return true;
     	}
+    	return false;
     }
     
-    // Method to get the Usuario based on the token
-	public Usuario getUsuarioByToken(String token) {
-		return tokenStore.get(token) != null ? tokenStore.get(token) : null;
+	public boolean isValidTokenWithUser(String token, Usuario u) {
+		return tokenStore.containsKey(token) && tokenStore.get(token).equals(u);
 	}
-    
-    // Method to get the Usuario based on the ID and token
-	public Usuario getUsuarioByID(int id, String token) {
-		Usuario u = tokenStore.get(token);
-		if (u != null && u.getId() == id) {
-			return u;
-		}
-		return null;
-	}
-    
+	
 	public boolean isValidToken(String token) {
 		return tokenStore.containsKey(token);
 	}

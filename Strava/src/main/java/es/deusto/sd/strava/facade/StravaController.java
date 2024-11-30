@@ -3,7 +3,6 @@ package es.deusto.sd.strava.facade;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class StravaController {
 	private final AuthService authService;
 	private final StravaService stravaService;
-    private final AtomicInteger idRetoGenerator = new AtomicInteger(0);
 	
 	public StravaController(AuthService authService, StravaService stravaService) {
 		this.authService = authService;
@@ -47,7 +45,7 @@ public class StravaController {
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
 	@GetMapping("users/{userID}/trainings")
-	public ResponseEntity<List<Entrenamiento>> getTrainings(
+	public ResponseEntity<List<EntrenamientoDTO>> getTrainings(
 		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
 		@RequestParam("userToken") String userToken,
 		@Parameter(name = "userID", description = "The id of a registered user", required = true, example = "1")
@@ -56,16 +54,17 @@ public class StravaController {
 		@RequestParam(required = false, name = "FechaInicio") Long fechaInicio, 
 		@Parameter(name = "FechaFin", description = "The end date to filter the trainings", required = false)
 		@RequestParam(required = false, name = "FechaFin") Long fechaFin){
-		Usuario u = authService.getUsuarioByID(userID, userToken);
-		if (u == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		Usuario u = stravaService.getUsuarioById(userID);
+		if (!authService.isValidTokenWithUser(userToken, u)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);			
 		}
+		
 		if (fechaInicio != null || fechaFin != null) {
-			return new ResponseEntity<>(stravaService.filtrarEntrenamientos(u.getEntrenamientos(), fechaInicio, fechaFin), HttpStatus.OK);
+			List<Entrenamiento> entrenamientos = stravaService.filtrarEntrenamientosPorUsuario(userID, fechaInicio, fechaFin);
+			return new ResponseEntity<>(parseEntrenamientosToDTO(entrenamientos), HttpStatus.OK);
 			
-		} else {
-			return new ResponseEntity<>(u.getEntrenamientos(), HttpStatus.OK);
 		}
+		return new ResponseEntity<>(parseEntrenamientosToDTO(u.getEntrenamientos()), HttpStatus.OK);
 	}
 	
 	// create training endpoint
@@ -81,11 +80,11 @@ public class StravaController {
 		@PathVariable("userID") int userID,
 		@Parameter(name = "Training", description = "The training object to create it", required = true)
 		@RequestBody EntrenamientoDTO training) {
-		Usuario u = authService.getUsuarioByID(userID, userToken);
-		if (u == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		Usuario u = stravaService.getUsuarioById(userID);
+		if (!authService.isValidTokenWithUser(userToken, u)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);			
 		}
-		u.addEntrenamiento(parseEntrenamientoDTO(training));
+		stravaService.anadirEntrenamiento(u, parseEntrenamientoDTO(training, u));
         return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -104,7 +103,7 @@ public class StravaController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 		}
 		Reto reto = parseRetoDTO(retoDTO);
-		stravaService.getMapaRetos().putIfAbsent(reto.getId(), reto);
+		stravaService.anadirReto(reto);
         return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
@@ -115,7 +114,7 @@ public class StravaController {
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
 	@GetMapping("challenges")
-	public ResponseEntity<List<Reto>> getChallenges(
+	public ResponseEntity<List<RetoDTO>> getChallenges(
 		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
 		@RequestParam("userToken") String userToken,
 		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
@@ -128,12 +127,9 @@ public class StravaController {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); 
 		}
 		if (fechaInicio != null || fechaFin != null || deporte != null) {
-			return new ResponseEntity<>(stravaService.filtrarRetos(stravaService.getMapaRetos(), fechaInicio, fechaFin, deporte), HttpStatus.OK);
-			
-		} else {
-			List<Reto> sublista = stravaService.getMapaRetos().size() > 5 ? new ArrayList<>(stravaService.getMapaRetos().values()).subList(0, 5) : new ArrayList<>(stravaService.getMapaRetos().values()); //Generado por chatGPT para crear una sublista que muestre solo los 5 primeros de la lista
-			return new ResponseEntity<>(sublista, HttpStatus.OK);
+			return new ResponseEntity<>(parseRetosToDTO(stravaService.filtrarRetos(fechaInicio, fechaFin, deporte)), HttpStatus.OK);			
 		}
+		return new ResponseEntity<>(parseRetosToDTO(stravaService.getTop5Retos()), HttpStatus.OK);
 	}
 	
 	//get users challenges endpoint
@@ -147,11 +143,11 @@ public class StravaController {
 			@RequestParam("userToken") String userToken,
 			@Parameter(name = "userID", description = "The id of a registered user", required = true, example = "1")
 			@PathVariable("userID") int userID){
-		Usuario u = authService.getUsuarioByID(userID, userToken);
-		if (u == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		Usuario u = stravaService.getUsuarioById(userID);
+		if (!authService.isValidTokenWithUser(userToken, u)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);			
 		}
-			return new ResponseEntity<>(stravaService.calcularPorcentajeReto(u.getRetosAceptados(), u.getEntrenamientos()), HttpStatus.OK);
+		return new ResponseEntity<>(stravaService.calcularPorcentajeReto(u.getRetosAceptados(), u.getEntrenamientos()), HttpStatus.OK);
 	}
 	
 	//accept challenge endpoint
@@ -167,29 +163,30 @@ public class StravaController {
 			@PathVariable("userID") int userID,
 			@Parameter(name = "idReto", description = "The id of the challenge to accept it", required = true)
 			@PathVariable("idReto") int idReto) {
-		Usuario u = authService.getUsuarioByID(userID, userToken);
-		if (u == null) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		Usuario u = stravaService.getUsuarioById(userID);
+		if (!authService.isValidTokenWithUser(userToken, u)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);			
 		}
-		u.addRetosAceptados(stravaService.getMapaRetos().get(idReto));
-		stravaService.getMapaRetos().get(idReto).addParticipantes(u.getId());
+		Reto r = stravaService.getRetoById(idReto);
+		stravaService.aceptarReto(u, r);
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	// parse DTO to entity
-	public Entrenamiento parseEntrenamientoDTO(EntrenamientoDTO dto) {
+	public Entrenamiento parseEntrenamientoDTO(EntrenamientoDTO dto, Usuario u) {
 		return new Entrenamiento(
             dto.getTitulo(),
             dto.getDeporte(),
             dto.getDistancia(),
             dto.getFechaHora(),
-            dto.getDuracion()
+            dto.getDuracion(),
+            u
         );
 	}
 	
 	public Reto parseRetoDTO(RetoDTO dto) {
 		return new Reto(
-				idRetoGenerator.incrementAndGet(),
+				null,
 				dto.getNombre(),
 				dto.getFechaInicio(),
 				dto.getFechaFin(),
@@ -197,5 +194,22 @@ public class StravaController {
 				dto.getTipoObjetivo(),
 				dto.getDeporte()
 			);
+	}
+	
+	public List<EntrenamientoDTO> parseEntrenamientosToDTO(List<Entrenamiento> entrenamientos) {
+		List<EntrenamientoDTO> resultado = new ArrayList<>();
+		for (Entrenamiento entrenamiento : entrenamientos) {
+			resultado.add(new EntrenamientoDTO(entrenamiento.getTitulo(), entrenamiento.getDeporte(), entrenamiento.getDistancia(), entrenamiento.getFechaHora(), entrenamiento.getDuracion()));
+		}
+		return resultado;
+	}
+	
+	public List<RetoDTO> parseRetosToDTO(List<Reto> retos) {
+		List<RetoDTO> resultado = new ArrayList<>();
+		for (Reto reto : retos) {
+			resultado.add(new RetoDTO(reto.getNombre(), reto.getFechaInicio(), reto.getFechaFin(), reto.getObjetivo(),reto.getTipoObjetivo(), reto.getDeporte()));
+		}
+		return resultado;
+		
 	}
 }

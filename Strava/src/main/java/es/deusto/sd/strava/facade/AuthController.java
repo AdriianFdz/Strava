@@ -6,7 +6,6 @@
 package es.deusto.sd.strava.facade;
 
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,9 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authorization Controller", description = "Login and logout operations")
 public class AuthController {
 
-    private AuthService authService;
-    private final AtomicInteger idUserGenerator = new AtomicInteger(0);
-
+    private final AuthService authService;
     
 	public AuthController(AuthService authService) {
 		this.authService = authService;
@@ -41,14 +38,17 @@ public class AuthController {
 	// Register endpoint
 	@Operation(summary = "Register a new user", description = "Allows a user to register by providing the user's details.", responses = {
 			@ApiResponse(responseCode = "201", description = "Created: User registered successfully"),
-			@ApiResponse(responseCode = "400", description = "Bad Request: Invalid user details"), })
+			@ApiResponse(responseCode = "400", description = "Bad Request: Invalid user details or the user exists"), })
 	@PostMapping("/register")
 	public ResponseEntity<Void> register(
 			@Parameter(name = "user", description = "User's details", required = true) 
 			@RequestBody UsuarioDTO user) {
 		
 		Usuario u = parseUsuarioDTO(user);
-		authService.register(u);
+		boolean resultado = authService.register(u);
+		if (!resultado) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<>(HttpStatus.CREATED);
 		
 	}
@@ -58,20 +58,26 @@ public class AuthController {
         description = "Allows a user to login by providing email and password. Returns a token if successful.",
         responses = {
             @ApiResponse(responseCode = "200", description = "OK: Login successful, returns a token"),
-            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid credentials, login failed"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized: Invalid password, login failed"),
+            @ApiResponse(responseCode = "404", description = "Not Found: Invalid email, login failed"),
         }
     )
     @PostMapping("/login")
     public ResponseEntity<String> login(
     		@Parameter(name = "credentials", description = "User's credentials", required = true)    	
     		@RequestBody CredencialesDTO credentials) {    	
-        Optional<String> token = authService.login(credentials.getEmail(), credentials.getPassword());
-        
-    	if (token.isPresent()) {
-    		return new ResponseEntity<>(token.get(), HttpStatus.OK);
-    	} else {
-    		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    	
+    	Optional<String> resultado = authService.login(credentials.getEmail(), credentials.getPassword());
+    	if (resultado.get().equals("Invalid password")) {
+    		return new ResponseEntity<>(resultado.get(), HttpStatus.UNAUTHORIZED);
     	}
+    	if (resultado.get().equals("Invalid email")) {
+    		return new ResponseEntity<>(resultado.get(), HttpStatus.NOT_FOUND);
+    	}
+    	if (resultado.get().equals("Internal Server Error")) {
+    		return new ResponseEntity<>(resultado.get(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+    	return new ResponseEntity<>(resultado.get(), HttpStatus.OK);
     }
 
     // Logout endpoint
@@ -98,6 +104,6 @@ public class AuthController {
     
     // parse DTO to entity
 	public Usuario parseUsuarioDTO(UsuarioDTO user) {
-		return new Usuario(idUserGenerator.incrementAndGet(), user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo(), user.getServidorAuth());
+		return new Usuario(null, user.getEmail(), user.getNombre(), user.getFechaNacimiento(), user.getPeso(), user.getAltura(), user.getFrecuenciaCardiacaMax(), user.getFrecuenciaCardiacaReposo(), user.getServidorAuth());
 	}
 }
