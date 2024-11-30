@@ -7,8 +7,8 @@ public abstract class LoginGatewayFactory {
 		switch (servidor) {
 		case GOOGLE:
 			return new GoogleServiceGateway();
-//		case META:
-//			return new MetaServiceGateway();
+		case META:
+			return new MetaServiceGateway();
 		default:
 			return null;
 		}
