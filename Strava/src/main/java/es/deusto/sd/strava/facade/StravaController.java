@@ -150,6 +150,28 @@ public class StravaController {
 		return new ResponseEntity<>(stravaService.calcularPorcentajeReto(u.getRetosAceptados(), u.getEntrenamientos()), HttpStatus.OK);
 	}
 	
+	// get challenge details endpoint
+	@Operation(summary = "Get details of a specific challenge", description = "Allows a registered user to view the details of an specific challenge.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: challenge retrieved successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"),
+			@ApiResponse(responseCode = "404", description = "Not found: The ID of the challengue doesn't exist"), })
+	
+	@GetMapping("challenges/{idReto}")
+	public ResponseEntity<RetoDTO> getChallengeDetail(
+		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
+		@RequestParam("userToken") String userToken,
+	    @Parameter(name = "idReto", description = "The ID of a challenge", required = true)
+	    @RequestParam("idReto") int idReto){
+		if (!authService.isValidToken(userToken)) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); 
+		}
+		Reto r = stravaService.getRetoById(idReto);
+		if (r == null) {
+			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		}
+		return new ResponseEntity<>(parseToRetoDTO(r), HttpStatus.OK);
+	}
+	
 	//accept challenge endpoint
 	@Operation(summary = "Accept a challenge", description = "Allows a user to accept a challenge.", responses = {
             @ApiResponse(responseCode = "200", description = "Success: Challenge accepted successfully"),
@@ -211,5 +233,10 @@ public class StravaController {
 		}
 		return resultado;
 		
+	}
+	
+	public RetoDTO parseToRetoDTO(Reto reto) {
+		return new RetoDTO(reto.getNombre(), reto.getFechaInicio(), reto.getFechaFin(), reto.getObjetivo(),
+				reto.getTipoObjetivo(), reto.getDeporte());
 	}
 }
