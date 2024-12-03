@@ -31,8 +31,8 @@ public class ConsoleClient {
 	// Token to be used during the session
 	private String token;
 	// Default email and password for login
-	private String defaultEmail = "blackwidow@marvel.com";
-	private String defaultPassword = "Bl@ckWid0w2023";
+	private String defaultEmail = "soyGoogle";
+	private String defaultPassword = "googlePass";
 	
 	private static final Logger logger = LoggerFactory.getLogger(ConsoleClient.class);
 

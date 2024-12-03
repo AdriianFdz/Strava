@@ -8,6 +8,10 @@ plugins {
 group = 'es.deusto.sd.strava.client'
 version = '1.0'
 
+application {
+    mainClass = 'es.deusto.sd.strava.client.web.WebClientApplication'
+}
+
 repositories {
 	mavenCentral()
 }
@@ -28,19 +32,11 @@ dependencies {
 task runConsoleClient(type: JavaExec) {
     group = 'application'
     description = 'Run the Console Client'
-    mainClass = 'es.deusto.sd.auctions.client.console.ConsoleClient'
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-// Task to run the swing client
-task runSwingClient(type: JavaExec) {
-    group = 'application'
-    description = 'Run the Swing Client'
-    mainClass = 'es.deusto.sd.auctions.client.swing.SwingClientGUI'
+    mainClass = 'es.deusto.sd.strava.client.console.ConsoleClient'
     classpath = sourceSets.main.runtimeClasspath
 }
 
 // Spring Boot configuration, defaults to running the web client
 bootRun {
-    mainClass.set("es.deusto.sd.auctions.client.web.WebClientApplication")
+    mainClass.set("es.deusto.sd.strava.client.web.WebClientApplication")
 }
