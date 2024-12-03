@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import es.deusto.sd.strava.client.data.Article;
 import es.deusto.sd.strava.client.data.Reto;
 import es.deusto.sd.strava.client.data.Credenciales;
 
