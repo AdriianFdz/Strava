@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
-import es.deusto.sd.auctions.strava.data.Article;
-import es.deusto.sd.auctions.strava.data.Category;
-import es.deusto.sd.auctions.strava.data.Credentials;
+import es.deusto.sd.strava.client.data.Article;
+import es.deusto.sd.strava.client.data.Category;
+import es.deusto.sd.strava.client.data.Credentials;
 
 /**
  * RestTemplateServiceProxy class is an implementation of the Service Proxy design pattern.

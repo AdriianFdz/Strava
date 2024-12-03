@@ -3,7 +3,7 @@
  * adapted using GitHub Copilot. It has been thoroughly reviewed 
  * and validated to ensure correctness and that it is free of errors.
  */
-package es.deusto.sd.auctions.client.web;
+package es.deusto.sd.strava.client.web;
 
 import java.util.List;
 
@@ -18,10 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.deusto.sd.auctions.client.data.Article;
-import es.deusto.sd.auctions.client.data.Category;
-import es.deusto.sd.auctions.client.data.Credentials;
-import es.deusto.sd.auctions.client.proxies.IAuctionsServiceProxy;
+import es.deusto.sd.strava.client.data.Article;
+import es.deusto.sd.strava.client.data.Category;
+import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
