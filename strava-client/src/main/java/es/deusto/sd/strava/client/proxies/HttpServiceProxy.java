@@ -17,8 +17,8 @@ import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.Credenciales;
 
 /**
  * HttpServiceProxy class is an implementation of the Service Proxy design pattern
@@ -57,7 +57,7 @@ public class HttpServiceProxy implements IAuctionsServiceProxy {
     }
 
     @Override
-    public String login(Credentials credentials) {
+    public String login(Credenciales credentials) {
         try {
             String credentialsJson = objectMapper.writeValueAsString(credentials);
 
@@ -101,7 +101,7 @@ public class HttpServiceProxy implements IAuctionsServiceProxy {
     }
 
     @Override
-    public List<Category> getAllCategories() {
+    public List<Reto> getAllCategories() {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(BASE_URL + "/auctions/categories"))
@@ -112,7 +112,7 @@ public class HttpServiceProxy implements IAuctionsServiceProxy {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
             return switch (response.statusCode()) {
-                case 200 -> objectMapper.readValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Category.class));
+                case 200 -> objectMapper.readValue(response.body(), objectMapper.getTypeFactory().constructCollectionType(List.class, Reto.class));
                 case 204 -> throw new RuntimeException("No Content: No categories found");
                 case 500 -> throw new RuntimeException("Internal server error while fetching categories");
                 default -> throw new RuntimeException("Failed to fetch categories with status code: " + response.statusCode());

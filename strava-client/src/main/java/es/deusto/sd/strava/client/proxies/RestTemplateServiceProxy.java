@@ -13,8 +13,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.Credenciales;
 
 /**
  * RestTemplateServiceProxy class is an implementation of the Service Proxy design pattern.
@@ -56,7 +56,7 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
     }
 
     @Override
-    public String login(Credentials credentials) {
+    public String login(Credenciales credentials) {
         String url = apiBaseUrl + "/auth/login";
         
         try {
@@ -85,7 +85,7 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Category> getAllCategories() {
+    public List<Reto> getAllCategories() {
         String url = apiBaseUrl + "/auctions/categories";
         
         try {

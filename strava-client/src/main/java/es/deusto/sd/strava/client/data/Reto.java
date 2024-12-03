@@ -5,16 +5,11 @@
  */
 package es.deusto.sd.strava.client.data;
 
-import java.util.Date;
-
-public record Article(
-	    Long id,
-	    String title,
-	    Float initialPrice,
-	    Float currentPrice,
-	    Integer bids,
-	    Date auctionEnd,
-	    String categoryName,
-	    String ownerName,
-	    String currency
+public record Reto(
+		String nombre,
+		long fechaInicio,
+		long fechaFin,
+		double objetivo,
+		String tipoObjetivo,
+		String deporte
 	) {}

@@ -5,4 +5,13 @@
  */
 package es.deusto.sd.strava.client.data;
 
-public record Category(String name) {}
+public record Usuario(
+	    String email,
+	    String nombre,
+	    long fechaNacimiento,
+	    String servidorAuth,
+	    double peso,
+	    int altura,
+	    int frecuenciaCardiacaMax,
+	    int frecuenciaCardiacaReposo
+	) {}

@@ -11,8 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.proxies.HttpServiceProxy;
 import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
 
@@ -46,7 +46,7 @@ public class ConsoleClient {
 
 	public boolean performLogin() {
 		try {
-			Credentials credentials = new Credentials(defaultEmail, defaultPassword);
+			Credenciales credentials = new Credenciales(defaultEmail, defaultPassword);
 
 			token = serviceProxy.login(credentials);
 			logger.info("Login successful. Token: {}", token);
@@ -61,7 +61,7 @@ public class ConsoleClient {
 
 	public boolean loadCategories() {
 		try {
-			List<Category> categories = serviceProxy.getAllCategories();
+			List<Reto> categories = serviceProxy.getAllCategories();
 			
 			if (categories == null || categories.isEmpty()) {
 				logger.info("No categories found.");
@@ -80,7 +80,7 @@ public class ConsoleClient {
 
 	public boolean loadArticlesAndPlaceBid() {
 		try {
-			List<Category> categories = serviceProxy.getAllCategories();
+			List<Reto> categories = serviceProxy.getAllCategories();
 			String categoryName = categories.get(0).name();
 			
 			logger.info("Fetching articles for category: {}", categoryName);

@@ -5,4 +5,10 @@
  */
 package es.deusto.sd.strava.client.data;
 
-public record Credentials(String email, String password) {}
+public record Entrenamiento(
+	    String titulo,
+	    String deporte,
+	    double distancia,
+	    long fechaHora,
+	    int duracion
+	) {}

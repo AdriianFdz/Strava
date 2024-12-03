@@ -19,8 +19,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -90,7 +90,7 @@ public class WebClientController {
 
 	@GetMapping("/")
 	public String home(Model model) {
-		List<Category> categories;
+		List<Reto> categories;
 
 		try {
 			categories = auctionsServiceProxy.getAllCategories();
@@ -114,7 +114,7 @@ public class WebClientController {
 	@PostMapping("/login")
 	public String performLogin(@RequestParam("email") String email, @RequestParam("password") String password,
 			@RequestParam(value = "redirectUrl", required = false) String redirectUrl, Model model) {
-		Credentials credentials = new Credentials(email, password);
+		Credenciales credentials = new Credenciales(email, password);
 
 		try {
 			token = auctionsServiceProxy.login(credentials);

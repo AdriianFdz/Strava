@@ -6,10 +6,12 @@
 package es.deusto.sd.strava.client.proxies;
 
 import java.util.List;
+import java.util.Map;
 
-import es.deusto.sd.strava.client.data.Article;
-import es.deusto.sd.strava.client.data.Category;
-import es.deusto.sd.strava.client.data.Credentials;
+import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.Usuario;
+import es.deusto.sd.strava.client.data.Credenciales;
+import es.deusto.sd.strava.client.data.Entrenamiento;
 
 /**
  * IAuctionsServiceProxy interface defines a contract for communication 
@@ -39,21 +41,26 @@ import es.deusto.sd.strava.client.data.Credentials;
  * (Description generated with ChatGPT 4o mini)
  */
 public interface IAuctionsServiceProxy {
+	
+	void register(Usuario usuario);
+
 	// Method for user login
-	String login(Credentials credentials);
+	String login(Credenciales credentials);
 
 	// Method for user logout
 	void logout(String token);
 
-	// Method to retrieve all categories
-	List<Category> getAllCategories();
-
-	// Method to retrieve articles by category name
-	List<Article> getArticlesByCategory(String categoryName, String currency);
-
-	// Method to get details of a specific article by ID
-	Article getArticleDetails(Long articleId, String currency);
-
-	// Method to place a bid on an article
-	void makeBid(Long articleId, Float amount, String currency, String token);
+	List<Entrenamiento> getTrainings(String userToken, int userId, long fechaInicio, long fechaFin);
+	
+	void addTraining(String userToken, int userId, Entrenamiento training);
+	
+	void addReto(String userToken, Reto reto);
+	
+	List<Reto> getChallenges(String userToken, long fechaInicio, long fechaFin, String deporte);
+	
+	Map<Integer, Double> getUserChallenges(String userToken, int userId);
+	
+	Reto getChallengeDetail(String userToken, int idReto);
+	
+	void acceptChallenge(String userToken, int userId, int idReto);
 }
