@@ -56,7 +56,7 @@ public interface IAuctionsServiceProxy {
 	
 	void addReto(String userToken, Reto reto);
 	
-	List<Reto> getChallenges(String userToken, long fechaInicio, long fechaFin, String deporte);
+	List<Reto> getChallenges(String userToken, Long fechaInicio, Long fechaFin, String deporte);
 	
 	Map<Integer, Double> getUserChallenges(String userToken, int userId);
 	

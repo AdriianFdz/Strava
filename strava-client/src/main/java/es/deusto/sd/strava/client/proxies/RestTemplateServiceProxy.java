@@ -21,33 +21,6 @@ import es.deusto.sd.strava.client.data.Usuario;
 import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.data.Entrenamiento;
 
-/**
- * RestTemplateServiceProxy class is an implementation of the Service Proxy design pattern.
- * This class acts as an intermediary between the client and the RESTful web service,
- * encapsulating all the REST API calls using Spring's RestTemplate and handling various 
- * exceptions that may occur during these interactions. This class serves as an intermediary 
- * for the client to perform CRUD operations, such as user authentication (login/logout),
- * retrieving categories and articles, and placing bids on articles. By encapsulating 
- * the HTTP request logic and handling various exceptions, this proxy provides a cleaner 
- * interface for clients to interact with the underlying service.
- * 
- * The @Service annotation indicates that this class is a Spring service component, 
- * which allows it to be detected and managed by the Spring container. This enables 
- * dependency injection for the RestTemplate instance, promoting loose coupling and 
- * enhancing testability.
- * 
- * RestTemplate is a synchronous client provided by Spring for making HTTP requests. 
- * It simplifies the interaction with RESTful services by providing a higher-level 
- * abstraction over the lower-level `HttpURLConnection`. Particularities of using 
- * RestTemplate include its capability to automatically convert HTTP responses into 
- * Java objects using message converters, support for various HTTP methods (GET, POST, 
- * PUT, DELETE), and built-in error handling mechanisms. However, it's important to 
- * note that since RestTemplate is synchronous, it can block the calling thread, which 
- * may not be suitable for high-performance applications that require non-blocking 
- * behavior.
- * 
- * (Description generated with ChatGPT 4o mini)
- */
 @Service
 public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
@@ -97,7 +70,6 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
                 userToken,
                 fechaInicio != null ? "&FechaInicio=" + fechaInicio : "",
                 fechaFin != null ? "&FechaFin=" + fechaFin : "");
-    	System.out.println(url);
     	try {
     		return restTemplate.getForObject(url, List.class);
     		
@@ -111,7 +83,17 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
     @Override
 	public void register(Usuario usuario) {
-		// TODO Auto-generated method stub
+    	String url = String.format("%s/auth/register", apiBaseUrl);
+        
+        try {
+            restTemplate.postForObject(url, usuario, Void.class);
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 400 -> throw new RuntimeException("Register failed");
+                default -> throw new RuntimeException("Register failed: " + e.getStatusText());
+            }
+        }
+        
 		
 	}
 
@@ -135,31 +117,84 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
 	@Override
 	public void addReto(String userToken, Reto reto) {
-		// TODO Auto-generated method stub
+        String url = String.format("%s/strava/challenges", apiBaseUrl);
+
+        try {
+            HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            Map<String, Object> requestBody = Map.of("userToken", userToken, "Reto", reto);
+            restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(requestBody, headers), Void.class);
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401 -> throw new RuntimeException("Unauthorized: Invalid token");
+                default -> throw new RuntimeException("Failed to add reto: " + e.getStatusText());
+            }
+        }
 		
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Reto> getChallenges(String userToken, long fechaInicio, long fechaFin, String deporte) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Reto> getChallenges(String userToken, Long fechaInicio, Long fechaFin, String deporte) {
+		String url = String.format("%s/strava/challenges?userToken=%s%s%s%s", 
+                apiBaseUrl,  
+                userToken,
+                fechaInicio != null ? "&FechaInicio=" + fechaInicio : "",
+                fechaFin != null ? "&FechaFin=" + fechaFin : "",
+                deporte != null ? "&Deporte=" + deporte : "");
+		try {
+    		return restTemplate.getForObject(url, List.class);
+    		
+    	} catch (HttpStatusCodeException e) {
+    		switch (e.getStatusCode().value()) {
+    		case 401: throw new RuntimeException("Credenciales incorrectas");
+    		default: throw new RuntimeException("Error al recuperar los retos");
+    		}
+    	}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Map<Integer, Double> getUserChallenges(String userToken, int userId) {
-		// TODO Auto-generated method stub
-		return null;
+		String url = String.format("%s/strava/users/%d/challenges?userToken=%s", apiBaseUrl, userId ,userToken);
+		try {
+    		return restTemplate.getForObject(url, Map.class);
+    		
+    	} catch (HttpStatusCodeException e) {
+    		switch (e.getStatusCode().value()) {
+    		case 401: throw new RuntimeException("Credenciales incorrectas");
+    		default: throw new RuntimeException("Error al recuperar los retos");
+    		}
+    	}
 	}
 
 	@Override
 	public Reto getChallengeDetail(String userToken, int idReto) {
-		// TODO Auto-generated method stub
-		return null;
+		String url = String.format("%s/strava/challenges/%d?userToken=%s", apiBaseUrl, idReto ,userToken);
+		try {
+    		return restTemplate.getForObject(url, Reto.class);
+    
+    	} catch (HttpStatusCodeException e) {
+    		switch (e.getStatusCode().value()) {
+    		case 404: throw new RuntimeException("Reto no encontrado");
+    		case 401: throw new RuntimeException("Credenciales incorrectas");
+    		default: throw new RuntimeException("Error al recuperar los retos");
+    		}
+    	}
 	}
 
 	@Override
 	public void acceptChallenge(String userToken, int userId, int idReto) {
-		// TODO Auto-generated method stub
+        String url = String.format("%s/strava/users/%d/challenges/%d", apiBaseUrl, userId, idReto);
+
+        try {
+            restTemplate.postForObject(url, userToken, Void.class);
+        } catch (HttpStatusCodeException e) {
+            switch (e.getStatusCode().value()) {
+                case 401 -> throw new RuntimeException("Unauthorized: Invalid token");
+                default -> throw new RuntimeException("Failed to accept training: " + e.getStatusText());
+            }
+        }
 		
 	}
 
