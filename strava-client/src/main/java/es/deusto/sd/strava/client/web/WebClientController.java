@@ -5,6 +5,7 @@
  */
 package es.deusto.sd.strava.client.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import es.deusto.sd.strava.client.data.Article;
 import es.deusto.sd.strava.client.data.Reto;
 import es.deusto.sd.strava.client.data.Credenciales;
+import es.deusto.sd.strava.client.data.Entrenamiento;
 import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -90,10 +91,9 @@ public class WebClientController {
 
 	@GetMapping("/")
 	public String home(Model model) {
-		List<Reto> categories;
+		List<Reto> categories = new ArrayList<Reto>();
 
 		try {
-			categories = auctionsServiceProxy.getAllCategories();
 			model.addAttribute("categories", categories);
 		} catch (RuntimeException e) {
 			model.addAttribute("errorMessage", "Failed to load categories: " + e.getMessage());
@@ -141,59 +141,33 @@ public class WebClientController {
 		// Redirect to the specified URL after logout
 		return "redirect:" + redirectUrl;
 	}
+	
+	@GetMapping("/users/{userId}/trainings")
+	public String getUserTrainings(
+	        @PathVariable int userId,
+	        @RequestParam(value = "startDate", required = false) Long startDate,
+	        @RequestParam(value = "endDate", required = false) Long endDate,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
 
-	@GetMapping("/category/{name}")
-	public String getCategoryArticles(@PathVariable("name") String name,
-			@RequestParam(value = "currency", defaultValue = "EUR") String currency, Model model) {
-		List<Article> articles;
+	    try {
+	        // Llama al servicio proxy para obtener los entrenamientos del usuario
+	        List<Entrenamiento> trainings = auctionsServiceProxy.getTrainings(token, userId, startDate, endDate);
 
-		try {
-			articles = auctionsServiceProxy.getArticlesByCategory(name, currency);
-			model.addAttribute("articles", articles);
-			model.addAttribute("categoryName", name);
-			model.addAttribute("selectedCurrency", currency);
-		} catch (RuntimeException e) {
-			model.addAttribute("errorMessage", "Failed to load articles for category: " + e.getMessage());
-			model.addAttribute("articles", null);
-			model.addAttribute("categoryName", name);
-			model.addAttribute("selectedCurrency", "EUR");
-		}
+	        // Agrega los entrenamientos al modelo para mostrarlos en la vista
+	        model.addAttribute("trainings", trainings);
+	        model.addAttribute("userId", userId);
+	        model.addAttribute("startDate", startDate);
+	        model.addAttribute("endDate", endDate);
 
-		return "category";
+	        return "trainings"; // Thymeleaf renderiza la plantilla "trainings.html"
+	    } catch (RuntimeException e) {
+	    	e.printStackTrace();
+	        // Si ocurre un error, añade el mensaje al modelo
+	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los entrenamientos: " + e.getMessage());
+	        return "redirect:/error"; // Redirige a una página de error o a otra apropiada
+	    }
 	}
 
-	@GetMapping("/article/{id}")
-	public String getArticleDetails(@PathVariable("id") Long id,
-			@RequestParam(value = "currency", defaultValue = "EUR") String currency, Model model) {
-		Article article;
-
-		try {
-			article = auctionsServiceProxy.getArticleDetails(id, currency);
-			model.addAttribute("article", article);
-			model.addAttribute("selectedCurrency", currency);
-		} catch (RuntimeException e) {
-			model.addAttribute("errorMessage", "Failed to load article details: " + e.getMessage());
-			model.addAttribute("article", null);
-			model.addAttribute("selectedCurrency", "EUR");
-		}
-
-		return "article";
-	}
-
-	@PostMapping("/bid")
-	public String makeBid(@RequestParam("id") Long id, @RequestParam("amount") Float amount,
-			@RequestParam(value = "currency", defaultValue = "EUR") String currency, Model model,
-			RedirectAttributes redirectAttributes) {
-		try {
-			auctionsServiceProxy.makeBid(id, amount, currency, token);
-			// RedirectAttributes are used to pass attributes to the redirected page
-			// Add a success message to be displayed in the article view
-			redirectAttributes.addFlashAttribute("successMessage", "Bid placed successfully!");
-		} catch (RuntimeException e) {
-			// Add an error message to be displayed in the article view
-			redirectAttributes.addFlashAttribute("errorMessage", "Failed to place bid: " + e.getMessage());
-		}
-
-		return "redirect:/article/" + id + "?currency=" + currency;
-	}
+	
 }

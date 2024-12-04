@@ -50,7 +50,7 @@ public interface IAuctionsServiceProxy {
 	// Method for user logout
 	void logout(String token);
 
-	List<Entrenamiento> getTrainings(String userToken, int userId, long fechaInicio, long fechaFin);
+	List<Entrenamiento> getTrainings(String userToken, int userId, Long fechaInicio, Long fechaFin);
 	
 	void addTraining(String userToken, int userId, Entrenamiento training);
 	

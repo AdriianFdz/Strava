@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Entrenamientos</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+    <h1>Entrenamientos del Usuario</h1>
+    <p>Usuario ID: <span th:text="${userId}"></span></p>
+    <p>Rango de fechas: <span th:text="${startDate}"></span> - <span th:text="${endDate}"></span></p>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Duración</th>
+                <th>Distancia</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="training : ${trainings}">
+                <!-- Convierte 'fechaHora' a un formato legible -->
+                <td th:text="${training.fechaHora}">Fecha</td>
+                <td th:text="${training.duracion}">Duración</td>
+                <td th:text="${training.distancia}">Distancia</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="/">Volver a inicio</a>
+</body>
+</html>

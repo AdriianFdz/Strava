@@ -6,14 +6,20 @@
 package es.deusto.sd.strava.client.proxies;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.Usuario;
 import es.deusto.sd.strava.client.data.Credenciales;
+import es.deusto.sd.strava.client.data.Entrenamiento;
 
 /**
  * RestTemplateServiceProxy class is an implementation of the Service Proxy design pattern.
@@ -57,7 +63,7 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
     @Override
     public String login(Credenciales credentials) {
         String url = apiBaseUrl + "/auth/login";
-        
+	        
         try {
             return restTemplate.postForObject(url, credentials, String.class);
         } catch (HttpStatusCodeException e) {
@@ -84,66 +90,78 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Reto> getAllCategories() {
-        String url = apiBaseUrl + "/auctions/categories";
-        
+    public List<Entrenamiento> getTrainings(String userToken, int userId, Long fechaInicio, Long fechaFin) {
+    	String url = String.format("%s/strava/users/%d/trainings?userToken=%s%s%s", 
+                apiBaseUrl, 
+                userId, 
+                userToken,
+                fechaInicio != null ? "&FechaInicio=" + fechaInicio : "",
+                fechaFin != null ? "&FechaFin=" + fechaFin : "");
+    	System.out.println(url);
+    	try {
+    		return restTemplate.getForObject(url, List.class);
+    		
+    	} catch (HttpStatusCodeException e) {
+    		switch (e.getStatusCode().value()) {
+    		case 401: throw new RuntimeException("Credenciales incorrectas");
+    		default: throw new RuntimeException("Error al recuperar los entrenamientos");
+    		}
+    	}
+    }
+
+    @Override
+	public void register(Usuario usuario) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+    @Override
+    public void addTraining(String userToken, int userId, Entrenamiento training) {
+        String url = String.format("%s/strava/users/%d", apiBaseUrl, userId);
+
         try {
-            return restTemplate.getForObject(url, List.class);
+            HttpHeaders headers = new org.springframework.http.HttpHeaders();
+            headers.set("Content-Type", "application/json");
+            Map<String, Object> requestBody = Map.of("userToken", userToken, "Training", training );
+            restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(requestBody, headers), Void.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
-                case 404 -> throw new RuntimeException("No categories found.");
-                default -> throw new RuntimeException("Failed to retrieve categories: " + e.getStatusText());
+                case 401 -> throw new RuntimeException("Unauthorized: Invalid token");
+                default -> throw new RuntimeException("Failed to add training: " + e.getStatusText());
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Article> getArticlesByCategory(String categoryName, String currency) {
-        String url = apiBaseUrl + "/auctions/categories/" + categoryName + "/articles?currency=" + currency;
-        
-        try {
-            return restTemplate.getForObject(url, List.class);
-        } catch (HttpStatusCodeException e) {
-            switch (e.getStatusCode().value()) {
-                case 404 -> throw new RuntimeException("Category not found: " + categoryName);
-                case 400 -> throw new RuntimeException("Invalid currency: " + currency);
-                default -> throw new RuntimeException("Failed to retrieve articles: " + e.getStatusText());
-            }
-        }
-    }
+	@Override
+	public void addReto(String userToken, Reto reto) {
+		// TODO Auto-generated method stub
+		
+	}
 
-    @Override
-    public Article getArticleDetails(Long articleId, String currency) {
-        String url = apiBaseUrl + "/auctions/articles/" + articleId + "/details?currency=" + currency;
-        
-        try {
-            return restTemplate.getForObject(url, Article.class);
-        } catch (HttpStatusCodeException e) {
-            switch (e.getStatusCode().value()) {
-                case 404 -> throw new RuntimeException("Article not found: ID " + articleId);
-                case 400 -> throw new RuntimeException("Invalid currency: " + currency);
-                default -> throw new RuntimeException("Failed to retrieve article details: " + e.getStatusText());
-            }
-        }
-    }
-    
-    @Override
-    public void makeBid(Long articleId, Float amount, String currency, String token) {
-    	String url = apiBaseUrl + "/auctions/articles/" + articleId + "/bid?amount=" +  amount + "&currency=" + currency;
-        
-        try {
-            restTemplate.postForObject(url, token, Void.class);
-        } catch (HttpStatusCodeException e) {
-            switch (e.getStatusCode().value()) {
-                case 401 -> throw new RuntimeException("User not authenticated");
-                case 404 -> throw new RuntimeException("Article not found");
-                case 400 -> throw new RuntimeException("Invalid currency: " + currency);
-                case 409 -> throw new RuntimeException("Bid amount must be greater than the current price");
-                case 204 -> { /* Successful bid */ }
-                case 500 -> throw new RuntimeException("Internal server error while processing bid");
-                default -> throw new RuntimeException("Bid failed with status code: " + e.getStatusCode());
-            }
-        }
-    }
+	@Override
+	public List<Reto> getChallenges(String userToken, long fechaInicio, long fechaFin, String deporte) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<Integer, Double> getUserChallenges(String userToken, int userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Reto getChallengeDetail(String userToken, int idReto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void acceptChallenge(String userToken, int userId, int idReto) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }
