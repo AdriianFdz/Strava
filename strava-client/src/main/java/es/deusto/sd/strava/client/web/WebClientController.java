@@ -7,6 +7,7 @@ package es.deusto.sd.strava.client.web;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -193,4 +194,115 @@ public class WebClientController {
 	        return "redirect:/users/" + userId + "/trainings"; // Redirigir a la página del usuario
 	    }			
 	}
+	
+	@PostMapping("/challenges")
+	public String addReto(
+			@RequestBody Reto reto,
+			Model model,
+			RedirectAttributes redirectAttributes
+			) {
+			
+	    try {
+	        // Llamada al servicio para agregar el entrenamiento
+	        auctionsServiceProxy.addReto(token, reto);
+
+	        // Si todo va bien, redirigimos a una página de éxito o a la vista de entrenamiento del usuario
+	        redirectAttributes.addFlashAttribute("message", "Reto agregado exitosamente");
+	        return "redirect:/challenges"; // Redirigir a la página del usuario
+
+	    } catch (Exception e) {
+	        // Si ocurre un error, registramos el error y redirigimos con un mensaje de error
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el reto");
+	        return "redirect:/challenges"; // Redirigir a la página del usuario
+	    }			
+	}
+	
+
+	
+	@PostMapping("/users/{userId}/challenges/{challengeId}")
+	public String acceptChallenge(
+	        @PathVariable int userId,
+	        @PathVariable int idReto,
+			Model model,
+			RedirectAttributes redirectAttributes
+			) {
+			
+	    try {
+	        auctionsServiceProxy.acceptChallenge(token, userId, idReto);
+
+	        redirectAttributes.addFlashAttribute("message", "Reto aceptado exitosamente");
+	        return "redirect:/users/" + userId + "/challenges/" + idReto; 
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al aceptar el reto");
+	        return "redirect:/users/" + userId + "/challenges/" + idReto; 
+	    }			
+	}
+	
+	@GetMapping("/challenges")
+	public String getChallenges(
+	        @RequestParam(value = "startDate", required = false) Long fechaInicio,
+	        @RequestParam(value = "endDate", required = false) Long fechaFin,
+	        @RequestParam(value = "sport", required = false) String deporte,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+
+	    try {
+	        List<Reto> retos = auctionsServiceProxy.getChallenges(token, fechaInicio, fechaFin, deporte);
+
+	        model.addAttribute("trainings", retos);
+	        model.addAttribute("fechaInicio", fechaInicio);
+	        model.addAttribute("fechafin", fechaFin);
+	        model.addAttribute("deporte", deporte);
+
+	        return "challenges"; 
+	    } catch (RuntimeException e) {
+	    	e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los retos: " + e.getMessage());
+	        return "redirect:/error"; 
+	    }			
+	}
+	
+	@GetMapping("/users/{userId}/challenges")
+	public String getUserChallenges(
+			@PathVariable int userId,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+
+	    try {
+	        Map<Integer, Double> map = auctionsServiceProxy.getUserChallenges(token, userId);
+
+	        model.addAttribute("trainings", map);
+	        model.addAttribute("userId", userId);
+
+	        return "userChallenges"; 
+	    } catch (RuntimeException e) {
+	    	e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los retos: " + e.getMessage());
+	        return "redirect:/error"; 
+	    }			
+	}
+	
+	@GetMapping("/challenges/{idreto}")
+	public String getUserChallengeDetail(
+			@PathVariable int idReto,
+	        Model model,
+	        RedirectAttributes redirectAttributes) {
+
+	    try {
+	        Reto reto = auctionsServiceProxy.getChallengeDetail(token, idReto);
+
+	        model.addAttribute("trainings", reto);
+	        model.addAttribute("userId", idReto);
+
+	        return "challengeDetail"; 
+	    } catch (RuntimeException e) {
+	    	e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener el detalle del reto: " + e.getMessage());
+	        return "redirect:/error"; 
+	    }			
+	}
+	
 }
