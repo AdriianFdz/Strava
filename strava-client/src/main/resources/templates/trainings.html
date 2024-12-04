@@ -3,10 +3,42 @@
 <head>
     <title>Entrenamientos</title>
     <meta charset="UTF-8">
+    <script>
+        // Función para enviar el formulario como JSON
+        function enviarEntrenamiento(event) {
+            event.preventDefault(); // Evita el comportamiento por defecto de envío del formulario
+
+            // Crear un objeto con los datos del formulario
+            const entrenamiento = {
+                titulo: document.getElementById('titulo').value,
+                deporte: document.getElementById('deporte').value,
+                distancia: document.getElementById('distancia').value,
+                fechaHora: document.getElementById('fechaHora').value,
+                duracion: document.getElementById('duracion').value
+            };
+
+            // Enviar los datos como JSON usando fetch
+            fetch(`/users/${document.getElementById('userId').value}/trainings`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(entrenamiento),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Entrenamiento agregado:', data);
+                // Puedes redirigir o mostrar un mensaje según la respuesta
+            })
+            .catch(error => {
+                console.error('Error al enviar entrenamiento:', error);
+            });
+        }
+    </script>
 </head>
 <body>
     <h1>Entrenamientos del Usuario</h1>
-    <p>Usuario ID: <span th:text="${userId}"></span></p>
+    <p>Usuario ID: <span th:text="${userId}" id="userId"></span></p>
     <p>Rango de fechas: <span th:text="${startDate}"></span> - <span th:text="${endDate}"></span></p>
 
     <table border="1">
@@ -26,6 +58,26 @@
             </tr>
         </tbody>
     </table>
+
+    <!-- Formulario para agregar un nuevo entrenamiento -->
+    <form onsubmit="enviarEntrenamiento(event)">
+        <label for="titulo">Título:</label>
+        <input type="text" id="titulo" name="titulo" required /><br />
+
+        <label for="deporte">Deporte:</label>
+        <input type="text" id="deporte" name="deporte" required /><br />
+
+        <label for="distancia">Distancia:</label>
+        <input type="number" id="distancia" name="distancia" required /><br />
+
+        <label for="fechaHora">Fecha y Hora:</label>
+        <input type="number" id="fechaHora" name="fechaHora" required /><br />
+
+        <label for="duracion">Duración (minutos):</label>
+        <input type="number" id="duracion" name="duracion" required /><br />
+
+        <button type="submit">Enviar Entrenamiento</button>
+    </form>
 
     <a href="/">Volver a inicio</a>
 </body>

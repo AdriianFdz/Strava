@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -167,7 +168,29 @@ public class WebClientController {
 	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los entrenamientos: " + e.getMessage());
 	        return "redirect:/error"; // Redirige a una página de error o a otra apropiada
 	    }
-	}
-
 	
+	}
+	@PostMapping("/users/{userId}/trainings")
+	public String addTraining(
+	        @PathVariable int userId,
+			@RequestBody Entrenamiento entrenamiento,
+			Model model,
+			RedirectAttributes redirectAttributes
+			) {
+			
+	    try {
+	        // Llamada al servicio para agregar el entrenamiento
+	        auctionsServiceProxy.addTraining(token, userId, entrenamiento);
+
+	        // Si todo va bien, redirigimos a una página de éxito o a la vista de entrenamiento del usuario
+	        redirectAttributes.addFlashAttribute("message", "Entrenamiento agregado exitosamente");
+	        return "redirect:/users/" + userId + "/trainings"; // Redirigir a la página del usuario
+
+	    } catch (Exception e) {
+	        // Si ocurre un error, registramos el error y redirigimos con un mensaje de error
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el entrenamiento");
+	        return "redirect:/users/" + userId + "/trainings"; // Redirigir a la página del usuario
+	    }			
+	}
 }
