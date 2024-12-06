@@ -84,6 +84,7 @@ public class StravaController {
 		if (!authService.isValidTokenWithUser(userToken, u)) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);			
 		}
+		System.out.println("titulo: " + training.getTitulo());
 		stravaService.anadirEntrenamiento(u, parseEntrenamientoDTO(training, u));
         return new ResponseEntity<>(HttpStatus.OK);
 	}

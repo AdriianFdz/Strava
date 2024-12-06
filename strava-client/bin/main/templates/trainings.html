@@ -1,84 +1,190 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Entrenamientos</title>
     <meta charset="UTF-8">
-    <script>
-        // Función para enviar el formulario como JSON
-        function enviarEntrenamiento(event) {
-            event.preventDefault(); // Evita el comportamiento por defecto de envío del formulario
-
-            // Crear un objeto con los datos del formulario
-            const entrenamiento = {
-                titulo: document.getElementById('titulo').value,
-                deporte: document.getElementById('deporte').value,
-                distancia: document.getElementById('distancia').value,
-                fechaHora: document.getElementById('fechaHora').value,
-                duracion: document.getElementById('duracion').value
-            };
-
-            // Enviar los datos como JSON usando fetch
-            fetch(`/users/${document.getElementById('userId').value}/trainings`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(entrenamiento),
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Entrenamiento agregado:', data);
-                // Puedes redirigir o mostrar un mensaje según la respuesta
-            })
-            .catch(error => {
-                console.error('Error al enviar entrenamiento:', error);
-            });
+    <title>Entrenamientos de Usuario</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
         }
-    </script>
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
 </head>
 <body>
-    <h1>Entrenamientos del Usuario</h1>
-    <p>Usuario ID: <span th:text="${userId}" id="userId"></span></p>
-    <p>Rango de fechas: <span th:text="${startDate}"></span> - <span th:text="${endDate}"></span></p>
+    <div class="container">
+        <h1>Entrenamientos de Usuario</h1>
 
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Duración</th>
-                <th>Distancia</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="training : ${trainings}">
-                <!-- Convierte 'fechaHora' a un formato legible -->
-                <td th:text="${training.fechaHora}">Fecha</td>
-                <td th:text="${training.duracion}">Duración</td>
-                <td th:text="${training.distancia}">Distancia</td>
-            </tr>
-        </tbody>
-    </table>
+        <!-- Mensaje de éxito -->
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
 
-    <!-- Formulario para agregar un nuevo entrenamiento -->
-    <form onsubmit="enviarEntrenamiento(event)">
-        <label for="titulo">Título:</label>
-        <input type="text" id="titulo" name="titulo" required /><br />
+        <!-- Mensaje de error -->
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
 
-        <label for="deporte">Deporte:</label>
-        <input type="text" id="deporte" name="deporte" required /><br />
+        <!-- Formulario para filtrar entrenamientos -->
+        <form th:action="@{'/users/' + ${userId} + '/trainings'}" method="get">
+            <div class="form-group">
+                <label>Fecha de Inicio:</label>
+                <input type="date" name="startDate" class="form-control" 
+                       th:value="${startDate != null ? #dates.format(new java.util.Date(startDate), 'yyyy-MM-dd') : ''}">
+            </div>
+            <div class="form-group">
+                <label>Fecha de Fin:</label>
+                <input type="date" name="endDate" class="form-control"
+                       th:value="${endDate != null ? #dates.format(new java.util.Date(endDate), 'yyyy-MM-dd') : ''}">
+            </div>
+            <button type="submit" class="btn">Filtrar</button>
+        </form>
 
-        <label for="distancia">Distancia:</label>
-        <input type="number" id="distancia" name="distancia" required /><br />
+        <!-- Tabla de Entrenamientos -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Deporte</th>
+                    <th>Distancia (km)</th>
+                    <th>Fecha</th>
+                    <th>Duración (min)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="training : ${trainings}">
+                    <td th:text="${training.titulo}"></td>
+                    <td th:text="${training.deporte}"></td>
+                    <td th:text="${#numbers.formatDecimal(training.distancia, 0, 2, 'POINT')}"></td>
+                    <td th:text="${#dates.format(new java.util.Date(training.fechaHora), 'dd/MM/yyyy HH:mm')}"></td>
+                    <td th:text="${training.duracion}"></td>
+                </tr>
+            </tbody>
+        </table>
 
-        <label for="fechaHora">Fecha y Hora:</label>
-        <input type="number" id="fechaHora" name="fechaHora" required /><br />
+        <!-- Formulario para agregar entrenamiento -->
+        <h2>Agregar Nuevo Entrenamiento</h2>
+		<form id="trainingForm" th:action="@{'/users/' + ${userId} + '/trainings'}" method="post">
+		    <!-- Hidden input to pass the token -->
+		    <input type="hidden" id="userToken" th:value="${token}" />
 
-        <label for="duracion">Duración (minutos):</label>
-        <input type="number" id="duracion" name="duracion" required /><br />
+		    <div class="form-group">
+		        <label>Título del Entrenamiento:</label>
+		        <input type="text" id="titulo" name="titulo" class="form-control" required>
+		    </div>
+		    <div class="form-group">
+		        <label>Deporte:</label>
+		        <input type="text" id="deporte" name="deporte" class="form-control" required>
+		    </div>
+		    <div class="form-group">
+		        <label>Distancia (km):</label>
+		        <input type="number" step="0.01" id="distancia" name="distancia" class="form-control" required>
+		    </div>
+		    <div class="form-group">
+		        <label>Fecha y Hora:</label>
+		        <input type="datetime-local" id="fechaHora" name="fechaHora" class="form-control" required>
+		    </div>
+		    <div class="form-group">
+		        <label>Duración (minutos):</label>
+		        <input type="number" id="duracion" name="duracion" class="form-control" required>
+		    </div>
+		    <button type="submit" class="btn">Agregar Entrenamiento</button>
+		</form>
 
-        <button type="submit">Enviar Entrenamiento</button>
-    </form>
+		<script th:inline="javascript">
+		document.getElementById('trainingForm').addEventListener('submit', function(event) {
+		    event.preventDefault();
 
-    <a href="/">Volver a inicio</a>
+
+		    // Prepare the training data object
+		    var training = {
+		        titulo: document.getElementById('titulo').value,
+		        deporte: document.getElementById('deporte').value,
+		        distancia: parseFloat(document.getElementById('distancia').value),
+		        fechaHora: new Date(document.getElementById('fechaHora').value).getTime(),
+		        duracion: parseInt(document.getElementById('duracion').value)
+		    };
+
+		    // Construct the URL with query parameters
+			var url = new URL(this.action);
+			
+		    // Send the data as JSON
+		    fetch(url, {
+		        method: 'POST',
+		        headers: {
+		            'Content-Type': 'application/json',
+		        },
+		        body: JSON.stringify(training)
+		    })
+		    .then(response => {
+		        if (response.ok) {
+		            // Redirect or refresh the page
+		            window.location.reload();
+		        } else {
+		            // Handle errors
+		            alert('Error al agregar el entrenamiento');
+		        }
+		    })
+		    .catch(error => {
+		        console.error('Error:', error);
+		        alert('Hubo un error al agregar el entrenamiento');
+		    });
+		});
+		</script>
 </body>
 </html>

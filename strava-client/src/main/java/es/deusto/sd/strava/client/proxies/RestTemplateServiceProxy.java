@@ -100,15 +100,15 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
     @Override
     public void addTraining(String userToken, int userId, Entrenamiento training) {
-        String url = String.format("%s/strava/users/%d", apiBaseUrl, userId);
+        String url = String.format("%s/strava/users/%d/trainings?userToken=%s", apiBaseUrl, userId, userToken);
 
         try {
             HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.set("Content-Type", "application/json");
-            Map<String, Object> requestBody = Map.of("userToken", userToken, "Training", training );
-            restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(requestBody, headers), Void.class);
+            restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(training, headers), Void.class);
         } catch (HttpStatusCodeException e) {
-            switch (e.getStatusCode().value()) {
+            e.printStackTrace();
+        	switch (e.getStatusCode().value()) {
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid token");
                 default -> throw new RuntimeException("Failed to add training: " + e.getStatusText());
             }
