@@ -162,7 +162,7 @@ public class StravaController {
 		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
 		@RequestParam("userToken") String userToken,
 	    @Parameter(name = "idReto", description = "The ID of a challenge", required = true)
-	    @RequestParam("idReto") int idReto){
+	    @PathVariable("idReto") int idReto){
 		if (!authService.isValidToken(userToken)) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); 
 		}

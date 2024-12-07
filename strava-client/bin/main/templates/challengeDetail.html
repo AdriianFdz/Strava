@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Reto</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <header class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <h1 class="fs-3 fw-bold"><i class="fas fa-trophy text-warning me-2"></i>Detalle del Reto</h1>
+        </div>
+    </header>
+
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-warning shadow">
+        <div class="container">
+            <a href="javascript:history.back()" class="btn btn-dark fw-bold">
+                <i class="fas fa-arrow-left me-2"></i> Volver
+            </a>
+        </div>
+    </nav>
+    
+    <div class="container my-5">
+        <!-- Título del reto -->
+        <h2 class="text-center text-dark fw-bold mb-4" th:text="${reto.nombre}">Nombre del Reto</h2>
+
+        <!-- Información del reto -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h5 class="card-title text-dark"><i class="fas fa-info-circle text-warning me-2"></i>Detalles</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <strong>Deporte:</strong> <span th:text="${reto.deporte}">Ejemplo de Deporte</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Objetivo:</strong> <span th:text="${reto.objetivo}">Ejemplo de Objetivo</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Tipo de Objetivo:</strong> <span th:text="${reto.tipoObjetivo}">Ejemplo Tipo</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Fecha Inicio:</strong> 
+                        <span th:text="${#dates.format(new java.util.Date(reto.fechaInicio), 'dd/MM/yyyy')}">01/01/2024</span>
+                    </li>
+                    <li class="list-group-item">
+                        <strong>Fecha Fin:</strong> 
+                        <span th:text="${#dates.format(new java.util.Date(reto.fechaFin), 'dd/MM/yyyy')}">31/12/2024</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0">
+                <i class="fas fa-graduation-cap text-warning"></i>
+                Created for <strong>Software Design</strong> subject. <strong>University of Deusto</strong> (2024).
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

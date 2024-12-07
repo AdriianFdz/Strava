@@ -3,100 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <title>Entrenamientos de Usuario</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-control {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn:hover {
-            background-color: #0056b3;
-        }
-        .alert {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .alert-error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-    </style>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
-    <div class="container">
-        <h1>Entrenamientos de Usuario</h1>
+<body class="bg-light">
 
-        <!-- Mensaje de éxito -->
+    <!-- Header -->
+    <header class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <a href="/" class="text-decoration-none text-white d-flex align-items-center justify-content-center">
+                <i class="fas fa-dumbbell fa-2x me-3 text-warning"></i>
+                <span class="fs-2 fw-bold">Entrenamientos de Usuario</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-warning shadow">
+        <div class="container">
+            <a href="javascript:history.back()" class="btn btn-dark fw-bold">
+                <i class="fas fa-arrow-left me-2"></i> Volver
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container my-5">
+        <h1 class="text-center text-dark fw-bold mb-4">Entrenamientos</h1>
+
+        <!-- Success Message -->
         <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
 
-        <!-- Mensaje de error -->
-        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+        <!-- Error Message -->
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
-        <!-- Formulario para filtrar entrenamientos -->
-        <form th:action="@{'/users/' + ${userId} + '/trainings'}" method="get">
-            <div class="form-group">
-                <label>Fecha de Inicio:</label>
-                <input type="date" name="startDate" class="form-control" 
-                       th:value="${startDate != null ? #dates.format(new java.util.Date(startDate), 'yyyy-MM-dd') : ''}">
+        <!-- Filter Form -->
+        <form th:action="@{'/users/' + ${userId} + '/trainings'}" method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label text-dark">Fecha de Inicio:</label>
+                    <input type="date" name="startDate" class="form-control" 
+                           th:value="${startDate != null ? #dates.format(new java.util.Date(startDate), 'yyyy-MM-dd') : ''}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-dark">Fecha de Fin:</label>
+                    <input type="date" name="endDate" class="form-control"
+                           th:value="${endDate != null ? #dates.format(new java.util.Date(endDate), 'yyyy-MM-dd') : ''}">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Fecha de Fin:</label>
-                <input type="date" name="endDate" class="form-control"
-                       th:value="${endDate != null ? #dates.format(new java.util.Date(endDate), 'yyyy-MM-dd') : ''}">
-            </div>
-            <button type="submit" class="btn">Filtrar</button>
+            <button type="submit" class="btn btn-warning text-dark fw-bold mt-3 w-100">Filtrar</button>
         </form>
 
-        <!-- Tabla de Entrenamientos -->
-        <table>
+        <!-- Trainings Table -->
+        <table class="table table-dark table-striped">
             <thead>
                 <tr>
                     <th>Título</th>
@@ -117,74 +78,85 @@
             </tbody>
         </table>
 
-        <!-- Formulario para agregar entrenamiento -->
-        <h2>Agregar Nuevo Entrenamiento</h2>
-		<form id="trainingForm" th:action="@{'/users/' + ${userId} + '/trainings'}" method="post">
-		    <!-- Hidden input to pass the token -->
-		    <input type="hidden" id="userToken" th:value="${token}" />
+        <!-- Add Training Form -->
+        <h2 class="text-center text-dark fw-bold mt-5">Agregar Nuevo Entrenamiento</h2>
+        <form id="trainingForm" th:action="@{'/users/' + ${userId} + '/trainings'}" method="post" class="card p-4 shadow-sm border-0">
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Título del Entrenamiento:</label>
+                <input type="text" id="titulo" name="titulo" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Deporte:</label>
+                <input type="text" id="deporte" name="deporte" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Distancia (km):</label>
+                <input type="number" step="0.01" id="distancia" name="distancia" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Fecha y Hora:</label>
+                <input type="datetime-local" id="fechaHora" name="fechaHora" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Duración (minutos):</label>
+                <input type="number" id="duracion" name="duracion" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-warning text-dark fw-bold w-100">Agregar Entrenamiento</button>
+        </form>
+    </div>
 
-		    <div class="form-group">
-		        <label>Título del Entrenamiento:</label>
-		        <input type="text" id="titulo" name="titulo" class="form-control" required>
-		    </div>
-		    <div class="form-group">
-		        <label>Deporte:</label>
-		        <input type="text" id="deporte" name="deporte" class="form-control" required>
-		    </div>
-		    <div class="form-group">
-		        <label>Distancia (km):</label>
-		        <input type="number" step="0.01" id="distancia" name="distancia" class="form-control" required>
-		    </div>
-		    <div class="form-group">
-		        <label>Fecha y Hora:</label>
-		        <input type="datetime-local" id="fechaHora" name="fechaHora" class="form-control" required>
-		    </div>
-		    <div class="form-group">
-		        <label>Duración (minutos):</label>
-		        <input type="number" id="duracion" name="duracion" class="form-control" required>
-		    </div>
-		    <button type="submit" class="btn">Agregar Entrenamiento</button>
-		</form>
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3">
+        <div class="container text-center">
+            <p class="mb-0">
+                <i class="fas fa-graduation-cap text-warning"></i> 
+                Created for <strong>Software Design</strong> subject. 
+                <strong>University of Deusto</strong> (2024).
+            </p>
+        </div>
+    </footer>
 
-		<script th:inline="javascript">
-		document.getElementById('trainingForm').addEventListener('submit', function(event) {
-		    event.preventDefault();
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- JavaScript Form Submission -->
+    <script th:inline="javascript">
+        document.getElementById('trainingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
 
-		    // Prepare the training data object
-		    var training = {
-		        titulo: document.getElementById('titulo').value,
-		        deporte: document.getElementById('deporte').value,
-		        distancia: parseFloat(document.getElementById('distancia').value),
-		        fechaHora: new Date(document.getElementById('fechaHora').value).getTime(),
-		        duracion: parseInt(document.getElementById('duracion').value)
-		    };
+            // Prepare the training data object
+            var training = {
+                titulo: document.getElementById('titulo').value,
+                deporte: document.getElementById('deporte').value,
+                distancia: parseFloat(document.getElementById('distancia').value),
+                fechaHora: new Date(document.getElementById('fechaHora').value).getTime(),
+                duracion: parseInt(document.getElementById('duracion').value)
+            };
 
-		    // Construct the URL with query parameters
-			var url = new URL(this.action);
-			
-		    // Send the data as JSON
-		    fetch(url, {
-		        method: 'POST',
-		        headers: {
-		            'Content-Type': 'application/json',
-		        },
-		        body: JSON.stringify(training)
-		    })
-		    .then(response => {
-		        if (response.ok) {
-		            // Redirect or refresh the page
-		            window.location.reload();
-		        } else {
-		            // Handle errors
-		            alert('Error al agregar el entrenamiento');
-		        }
-		    })
-		    .catch(error => {
-		        console.error('Error:', error);
-		        alert('Hubo un error al agregar el entrenamiento');
-		    });
-		});
-		</script>
+            // Construct the URL with query parameters
+            var url = new URL(this.action);
+
+            // Send the data as JSON
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(training)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Redirect or refresh the page
+                    window.location.reload();
+                } else {
+                    alert('Error al agregar el entrenamiento');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error al agregar el entrenamiento');
+            });
+        });
+    </script>
 </body>
 </html>

@@ -49,7 +49,7 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
     
     @Override    
     public void logout(String token) {
-        String url = apiBaseUrl + "/auth/logout";
+        String url = String.format("%s/auth/logout?userToken=%s", apiBaseUrl, token);
         
         try {
             restTemplate.postForObject(url, token, Void.class);
@@ -117,13 +117,12 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
 
 	@Override
 	public void addReto(String userToken, Reto reto) {
-        String url = String.format("%s/strava/challenges", apiBaseUrl);
+        String url = String.format("%s/strava/challenges?userToken=%s", apiBaseUrl, userToken);
 
         try {
             HttpHeaders headers = new org.springframework.http.HttpHeaders();
             headers.set("Content-Type", "application/json");
-            Map<String, Object> requestBody = Map.of("userToken", userToken, "Reto", reto);
-            restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(requestBody, headers), Void.class);
+            restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(reto, headers), Void.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid token");

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Retos</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+    <!-- Header -->
+    <header class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <a href="/" class="text-decoration-none text-white d-flex align-items-center justify-content-center">
+                <i class="fas fa-flag-checkered fa-2x me-3 text-warning"></i>
+                <span class="fs-2 fw-bold">Gestión de Retos</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-warning shadow">
+        <div class="container">
+            <a href="javascript:history.back()" class="btn btn-dark fw-bold">
+                <i class="fas fa-arrow-left me-2"></i> Volver
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main content -->
+    <div class="container my-5">
+        <h1 class="text-center text-dark fw-bold mb-4">Retos</h1>
+
+        <!-- Success and error messages -->
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <!-- Filter form -->
+        <form th:action="@{'/challenges'}" method="get" class="mb-4">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label text-dark">Fecha de Inicio:</label>
+                    <input type="date" name="fechaInicio" class="form-control" th:value="${fechaInicio != null ? #dates.format(new java.util.Date(fechaInicio), 'yyyy-MM-dd') : ''}">
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label text-dark">Fecha de Fin:</label>
+                    <input type="date" name="fechaFin" class="form-control" th:value="${fechaFin != null ? #dates.format(new java.util.Date(fechaFin), 'yyyy-MM-dd') : ''}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-warning text-dark fw-bold mt-3 w-100">Filtrar</button>
+        </form>
+
+        <!-- Challenges table -->
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Deporte</th>
+                    <th>Objetivo</th>
+                    <th>Tipo Objetivo</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="challenge : ${retos}">
+                    <td th:text="${challenge.nombre}"></td>
+                    <td th:text="${challenge.deporte}"></td>
+                    <td th:text="${challenge.objetivo}"></td>
+                    <td th:text="${challenge.tipoObjetivo}"></td>
+                    <td th:text="${#dates.format(new java.util.Date(challenge.fechaInicio), 'dd/MM/yyyy')}"></td>
+                    <td th:text="${#dates.format(new java.util.Date(challenge.fechaFin), 'dd/MM/yyyy')}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Add challenge form -->
+        <h2 class="text-center text-dark fw-bold mt-5">Añadir Nuevo Reto</h2>
+        <form id="challengeForm" th:action="@{'/challenges'}" method="post" class="card p-4 shadow-sm border-0">
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Nombre del Reto:</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Deporte:</label>
+                <input type="text" id="deporte" name="deporte" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Objetivo:</label>
+                <input type="number" step="0.01" id="objetivo" name="objetivo" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Tipo Objetivo:</label>
+                <input type="text" id="tipoObjetivo" name="tipoObjetivo" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Fecha de Inicio:</label>
+                <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label class="form-label text-dark">Fecha de Fin:</label>
+                <input type="date" id="fechaFin" name="fechaFin" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-warning text-dark fw-bold w-100">Agregar Reto</button>
+        </form>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-3">
+        <div class="container text-center">
+            <p class="mb-0">
+                <i class="fas fa-graduation-cap text-warning"></i>
+                Created for <strong>Software Design</strong> subject. <strong>University of Deusto</strong> (2024).
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Form submission JavaScript -->
+    <script th:inline="javascript">
+        document.getElementById('challengeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            // JavaScript code to handle form submission
+        });
+    </script>
+</body>
+</html>

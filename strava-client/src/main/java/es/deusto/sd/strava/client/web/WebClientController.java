@@ -146,7 +146,7 @@ public class WebClientController {
 	
 	@GetMapping("/users/{userId}/trainings")
 	public String getUserTrainings(
-	        @PathVariable int userId,
+	        @PathVariable(name = "userId") int userId,
 	        @RequestParam(value = "startDate", required = false) Long startDate,
 	        @RequestParam(value = "endDate", required = false) Long endDate,
 	        Model model,
@@ -252,7 +252,7 @@ public class WebClientController {
 	    try {
 	        List<Reto> retos = auctionsServiceProxy.getChallenges(token, fechaInicio, fechaFin, deporte);
 
-	        model.addAttribute("trainings", retos);
+	        model.addAttribute("retos", retos);
 	        model.addAttribute("fechaInicio", fechaInicio);
 	        model.addAttribute("fechafin", fechaFin);
 	        model.addAttribute("deporte", deporte);
@@ -267,25 +267,31 @@ public class WebClientController {
 	
 	@GetMapping("/users/{userId}/challenges")
 	public String getUserChallenges(
-			@PathVariable int userId,
+	        @PathVariable int userId,
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
 
 	    try {
-	        Map<Integer, Double> map = auctionsServiceProxy.getUserChallenges(token, userId);
+	        // Mapa con ID del reto y porcentaje completado
+	        Map<Integer, Double> userChallenges = auctionsServiceProxy.getUserChallenges(token, userId);
+	        
+	        // Lista de retos disponibles
+	        List<Reto> availableChallenges = auctionsServiceProxy.getChallenges(token, null, null, null);
 
-	        model.addAttribute("trainings", map);
+	        // Añade los datos al modelo
+	        model.addAttribute("retos", userChallenges);
+	        model.addAttribute("availableChallenges", availableChallenges);
 	        model.addAttribute("userId", userId);
 
 	        return "userChallenges"; 
 	    } catch (RuntimeException e) {
-	    	e.printStackTrace();
+	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los retos: " + e.getMessage());
 	        return "redirect:/error"; 
-	    }			
+	    }
 	}
 	
-	@GetMapping("/challenges/{idreto}")
+	@GetMapping("/challenges/{idReto}")
 	public String getUserChallengeDetail(
 			@PathVariable int idReto,
 	        Model model,
@@ -294,7 +300,7 @@ public class WebClientController {
 	    try {
 	        Reto reto = auctionsServiceProxy.getChallengeDetail(token, idReto);
 
-	        model.addAttribute("trainings", reto);
+	        model.addAttribute("reto", reto);
 	        model.addAttribute("userId", idReto);
 
 	        return "challengeDetail"; 
