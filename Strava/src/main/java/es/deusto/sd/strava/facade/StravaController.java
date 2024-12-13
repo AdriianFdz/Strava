@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import es.deusto.sd.strava.dto.EntrenamientoDTO;
 import es.deusto.sd.strava.dto.RetoDTO;
+import es.deusto.sd.strava.dto.RetoIdDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
 import es.deusto.sd.strava.entity.Reto;
 import es.deusto.sd.strava.entity.TipoDeporte;
@@ -115,7 +116,7 @@ public class StravaController {
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
 	@GetMapping("challenges")
-	public ResponseEntity<List<RetoDTO>> getChallenges(
+	public ResponseEntity<List<RetoIdDTO>> getChallenges(
 		@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") 
 		@RequestParam("userToken") String userToken,
 		@Parameter(name = "FechaInicio", description = "The start date to filter the trainings", required = false)
@@ -227,10 +228,10 @@ public class StravaController {
 		return resultado;
 	}
 	
-	public List<RetoDTO> parseRetosToDTO(List<Reto> retos) {
-		List<RetoDTO> resultado = new ArrayList<>();
+	public List<RetoIdDTO> parseRetosToDTO(List<Reto> retos) {
+		List<RetoIdDTO> resultado = new ArrayList<>();
 		for (Reto reto : retos) {
-			resultado.add(new RetoDTO(reto.getNombre(), reto.getFechaInicio(), reto.getFechaFin(), reto.getObjetivo(),reto.getTipoObjetivo(), reto.getDeporte()));
+			resultado.add(new RetoIdDTO(reto.getId(), reto.getNombre(), reto.getFechaInicio(), reto.getFechaFin(), reto.getObjetivo(),reto.getTipoObjetivo(), reto.getDeporte()));
 		}
 		return resultado;
 		

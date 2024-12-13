@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.TokenId;
 import es.deusto.sd.strava.client.data.Usuario;
 import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.data.Entrenamiento;
@@ -40,12 +41,12 @@ import es.deusto.sd.strava.client.data.Entrenamiento;
  * 
  * (Description generated with ChatGPT 4o mini)
  */
-public interface IAuctionsServiceProxy {
+public interface IStravaServiceProxy {
 	
 	void register(Usuario usuario);
 
 	// Method for user login
-	String login(Credenciales credentials);
+	TokenId login(Credenciales credentials);
 
 	// Method for user logout
 	void logout(String token);

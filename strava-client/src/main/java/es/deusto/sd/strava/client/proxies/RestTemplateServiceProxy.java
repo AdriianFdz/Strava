@@ -17,12 +17,13 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.TokenId;
 import es.deusto.sd.strava.client.data.Usuario;
 import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.data.Entrenamiento;
 
 @Service
-public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
+public class RestTemplateServiceProxy implements IStravaServiceProxy{
 
     private final RestTemplate restTemplate;
 
@@ -34,11 +35,11 @@ public class RestTemplateServiceProxy implements IAuctionsServiceProxy{
     }
 
     @Override
-    public String login(Credenciales credentials) {
+    public TokenId login(Credenciales credentials) {
         String url = apiBaseUrl + "/auth/login";
 	        
         try {
-            return restTemplate.postForObject(url, credentials, String.class);
+            return restTemplate.postForObject(url, credentials, TokenId.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401 -> throw new RuntimeException("Login failed: Invalid credentials.");

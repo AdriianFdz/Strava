@@ -72,8 +72,8 @@
                     <td th:text="${challenge.deporte}"></td>
                     <td th:text="${challenge.objetivo}"></td>
                     <td th:text="${challenge.tipoObjetivo}"></td>
-                    <td th:text="${#dates.format(new java.util.Date(challenge.fechaInicio), 'dd/MM/yyyy')}"></td>
-                    <td th:text="${#dates.format(new java.util.Date(challenge.fechaFin), 'dd/MM/yyyy')}"></td>
+					<td th:text="${challenge.fechaInicio != null ? #dates.format(new java.util.Date(challenge.fechaInicio), 'dd/MM/yyyy') : ''}"></td>
+					<td th:text="${challenge.fechaFin != null ? #dates.format(new java.util.Date(challenge.fechaFin), 'dd/MM/yyyy') : ''}"></td>
                 </tr>
             </tbody>
         </table>

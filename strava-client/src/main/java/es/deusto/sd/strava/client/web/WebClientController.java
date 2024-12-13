@@ -22,9 +22,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.deusto.sd.strava.client.data.Reto;
+import es.deusto.sd.strava.client.data.TokenId;
 import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.data.Entrenamiento;
-import es.deusto.sd.strava.client.proxies.IAuctionsServiceProxy;
+import es.deusto.sd.strava.client.proxies.IStravaServiceProxy;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
@@ -79,9 +80,10 @@ import jakarta.servlet.http.HttpServletRequest;
 public class WebClientController {
 
 	@Autowired
-	private IAuctionsServiceProxy auctionsServiceProxy;
+	private IStravaServiceProxy stravaServiceProxy;
 
 	private String token; // Stores the session token
+	private int userId;
 
 	// Add current URL and token to all views
 	@ModelAttribute
@@ -119,7 +121,9 @@ public class WebClientController {
 		Credenciales credentials = new Credenciales(email, password);
 
 		try {
-			token = auctionsServiceProxy.login(credentials);
+			TokenId tokenId = stravaServiceProxy.login(credentials);
+			token = tokenId.token();
+			userId = tokenId.id();
 
 			// Redirect to the original page or root if redirectUrl is null
 			return "redirect:" + (redirectUrl != null && !redirectUrl.isEmpty() ? redirectUrl : "/");
@@ -133,7 +137,7 @@ public class WebClientController {
 	public String performLogout(@RequestParam(value = "redirectUrl", defaultValue = "/") String redirectUrl,
 			Model model) {
 		try {
-			auctionsServiceProxy.logout(token);
+			stravaServiceProxy.logout(token);
 			token = null; // Clear the token after logout
 			model.addAttribute("successMessage", "Logout successful.");
 		} catch (RuntimeException e) {
@@ -144,9 +148,8 @@ public class WebClientController {
 		return "redirect:" + redirectUrl;
 	}
 	
-	@GetMapping("/users/{userId}/trainings")
+	@GetMapping("/users/trainings")
 	public String getUserTrainings(
-	        @PathVariable(name = "userId") int userId,
 	        @RequestParam(value = "startDate", required = false) Long startDate,
 	        @RequestParam(value = "endDate", required = false) Long endDate,
 	        Model model,
@@ -154,8 +157,7 @@ public class WebClientController {
 
 	    try {
 	        // Llama al servicio proxy para obtener los entrenamientos del usuario
-	        List<Entrenamiento> trainings = auctionsServiceProxy.getTrainings(token, userId, startDate, endDate);
-
+	        List<Entrenamiento> trainings = stravaServiceProxy.getTrainings(token, userId, startDate, endDate);
 	        // Agrega los entrenamientos al modelo para mostrarlos en la vista
 	        model.addAttribute("trainings", trainings);
 	        model.addAttribute("userId", userId);
@@ -171,9 +173,8 @@ public class WebClientController {
 	    }
 	
 	}
-	@PostMapping("/users/{userId}/trainings")
+	@PostMapping("/trainings")
 	public String addTraining(
-	        @PathVariable int userId,
 			@RequestBody Entrenamiento entrenamiento,
 			Model model,
 			RedirectAttributes redirectAttributes
@@ -181,7 +182,7 @@ public class WebClientController {
 			
 	    try {
 	        // Llamada al servicio para agregar el entrenamiento
-	        auctionsServiceProxy.addTraining(token, userId, entrenamiento);
+	        stravaServiceProxy.addTraining(token, userId, entrenamiento);
 
 	        // Si todo va bien, redirigimos a una página de éxito o a la vista de entrenamiento del usuario
 	        redirectAttributes.addFlashAttribute("message", "Entrenamiento agregado exitosamente");
@@ -204,7 +205,7 @@ public class WebClientController {
 			
 	    try {
 	        // Llamada al servicio para agregar el entrenamiento
-	        auctionsServiceProxy.addReto(token, reto);
+	        stravaServiceProxy.addReto(token, reto);
 
 	        // Si todo va bien, redirigimos a una página de éxito o a la vista de entrenamiento del usuario
 	        redirectAttributes.addFlashAttribute("message", "Reto agregado exitosamente");
@@ -220,16 +221,15 @@ public class WebClientController {
 	
 
 	
-	@PostMapping("/users/{userId}/challenges/{challengeId}")
+	@PostMapping("/users/challenges/{challengeId}")
 	public String acceptChallenge(
-	        @PathVariable int userId,
 	        @PathVariable int idReto,
 			Model model,
 			RedirectAttributes redirectAttributes
 			) {
 			
 	    try {
-	        auctionsServiceProxy.acceptChallenge(token, userId, idReto);
+	        stravaServiceProxy.acceptChallenge(token, userId, idReto);
 
 	        redirectAttributes.addFlashAttribute("message", "Reto aceptado exitosamente");
 	        return "redirect:/users/" + userId + "/challenges/" + idReto; 
@@ -250,7 +250,7 @@ public class WebClientController {
 	        RedirectAttributes redirectAttributes) {
 
 	    try {
-	        List<Reto> retos = auctionsServiceProxy.getChallenges(token, fechaInicio, fechaFin, deporte);
+	        List<Reto> retos = stravaServiceProxy.getChallenges(token, fechaInicio, fechaFin, deporte);
 
 	        model.addAttribute("retos", retos);
 	        model.addAttribute("fechaInicio", fechaInicio);
@@ -265,18 +265,17 @@ public class WebClientController {
 	    }			
 	}
 	
-	@GetMapping("/users/{userId}/challenges")
+	@GetMapping("/users/challenges")
 	public String getUserChallenges(
-	        @PathVariable int userId,
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
 
 	    try {
 	        // Mapa con ID del reto y porcentaje completado
-	        Map<Integer, Double> userChallenges = auctionsServiceProxy.getUserChallenges(token, userId);
+	        Map<Integer, Double> userChallenges = stravaServiceProxy.getUserChallenges(token, userId);
 	        
 	        // Lista de retos disponibles
-	        List<Reto> availableChallenges = auctionsServiceProxy.getChallenges(token, null, null, null);
+	        List<Reto> availableChallenges = stravaServiceProxy.getChallenges(token, null, null, null);
 
 	        // Añade los datos al modelo
 	        model.addAttribute("retos", userChallenges);
@@ -298,7 +297,7 @@ public class WebClientController {
 	        RedirectAttributes redirectAttributes) {
 
 	    try {
-	        Reto reto = auctionsServiceProxy.getChallengeDetail(token, idReto);
+	        Reto reto = stravaServiceProxy.getChallengeDetail(token, idReto);
 
 	        model.addAttribute("reto", reto);
 	        model.addAttribute("userId", idReto);
