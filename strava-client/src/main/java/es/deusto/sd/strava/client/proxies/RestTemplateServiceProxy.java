@@ -185,10 +185,10 @@ public class RestTemplateServiceProxy implements IStravaServiceProxy{
 
 	@Override
 	public void acceptChallenge(String userToken, int userId, int idReto) {
-        String url = String.format("%s/strava/users/%d/challenges/%d", apiBaseUrl, userId, idReto);
+        String url = String.format("%s/strava/users/%d/challenges/%d?userToken=%s", apiBaseUrl, userId, idReto, userToken);
 
         try {
-            restTemplate.postForObject(url, userToken, Void.class);
+            restTemplate.postForObject(url, null, Void.class);
         } catch (HttpStatusCodeException e) {
             switch (e.getStatusCode().value()) {
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid token");

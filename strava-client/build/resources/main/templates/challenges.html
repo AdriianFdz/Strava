@@ -126,8 +126,8 @@
 	    document.getElementById('challengeForm').addEventListener('submit', function(event) {
 	        event.preventDefault();
 
-	        // Prepare the training data object
-	        var training = {
+	        // Prepare the challenge data object
+	        var challenge = {
 	            nombre: document.getElementById('nombre').value,
                 deporte: document.getElementById('deporte').value,
                 objetivo: document.getElementById('objetivo').value,
@@ -145,7 +145,7 @@
 	            headers: {
 	                'Content-Type': 'application/json',
 	            },
-	            body: JSON.stringify(training)
+	            body: JSON.stringify(challenge)
 	        })
 	        .then(response => {
 	            if (response.ok) {

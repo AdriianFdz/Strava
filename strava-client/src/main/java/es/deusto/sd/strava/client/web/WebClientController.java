@@ -223,22 +223,21 @@ public class WebClientController {
 	
 	@PostMapping("/users/challenges/{challengeId}")
 	public String acceptChallenge(
-	        @PathVariable int idReto,
+	        @PathVariable int challengeId,
 			Model model,
 			RedirectAttributes redirectAttributes
 			) {
 			
 	    try {
-	        stravaServiceProxy.acceptChallenge(token, userId, idReto);
+	        stravaServiceProxy.acceptChallenge(token, userId, challengeId);
 
 	        redirectAttributes.addFlashAttribute("message", "Reto aceptado exitosamente");
-	        return "redirect:/users/" + userId + "/challenges/" + idReto; 
 
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al aceptar el reto");
-	        return "redirect:/users/" + userId + "/challenges/" + idReto; 
 	    }			
+        return "redirect:/users/challenges"; 
 	}
 	
 	@GetMapping("/challenges")

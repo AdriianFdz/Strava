@@ -57,7 +57,8 @@
         <h2 class="text-center text-dark fw-bold my-4">Retos Disponibles</h2>
         <table class="table table-dark table-striped table-hover">
             <thead>
-                <tr>
+                <tr>					
+                    <th>ID</th>
                     <th>Nombre</th>
                     <th>Deporte</th>
                     <th>Objetivo</th>
@@ -68,12 +69,13 @@
             </thead>
             <tbody>
                 <tr th:each="challenge : ${availableChallenges}">
+                    <td th:text="${challenge.id}"></td>
                     <td th:text="${challenge.nombre}"></td>
                     <td th:text="${challenge.deporte}"></td>
                     <td th:text="${challenge.objetivo}"></td>
                     <td th:text="${challenge.tipoObjetivo}"></td>
-					<td th:text="${challenge.fechaInicio != null ? #dates.format(new java.util.Date(challenge.fechaInicio), 'dd/MM/yyyy') : ''}"></td>
-					<td th:text="${challenge.fechaFin != null ? #dates.format(new java.util.Date(challenge.fechaFin), 'dd/MM/yyyy') : ''}"></td>
+					<td th:text="${#dates.format(new java.util.Date(challenge.fechaInicio), 'dd/MM/yyyy')}"></td>
+					<td th:text="${#dates.format(new java.util.Date(challenge.fechaFin), 'dd/MM/yyyy')}"></td>
                 </tr>
             </tbody>
         </table>
@@ -111,18 +113,14 @@
 	        // Obtener el id del reto
 	        var challengeId = document.getElementById('idReto').value;
 
-	        // Obtener el userId de algún lugar (por ejemplo, un atributo data- o una variable global)
-	        //var userId = document.getElementById('userId').value;
-
 	        // Construir la URL dinámica
-	        var url = `/users/${4}/challenges/${challengeId}`;
+			var url = `/users/challenges/${challengeId}`;
 
 	        fetch(url, {
 	            method: 'POST',
 	            headers: {
 	                'Content-Type': 'application/json',
 	            },
-	            body: JSON.stringify({ idReto: challengeId }) // Enviar datos si es necesario
 	        })
 	        .then(response => {
 	            if (response.ok) {
