@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import es.deusto.sd.strava.dao.UsuarioRepository;
+import es.deusto.sd.strava.dto.TokenIdDTO;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.external.LoginGatewayFactory;
 
@@ -25,24 +26,30 @@ public class AuthService {
     
     
     // Login method that checks if the Usuario exists in the database and validates the password
-    public Optional<String> login(String email, String password) {	
+    public TokenIdDTO login(String email, String password) {	
     	Optional<Usuario> usuario = usuarioRepository.findByEmail(email);
+    	TokenIdDTO resultado = new TokenIdDTO();
     	if (usuario.isEmpty()) {
-    		return Optional.of("Invalid email");			
+    		resultado.setToken("Invalid email");
+    		return resultado;			
 		}
     	
-    	ResponseEntity<String> resultado = LoginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password);
+    	ResponseEntity<String> resultadoFactory = LoginGatewayFactory.getLoginServiceGateway(usuario.get().getServidorAuth()).login(email, password);
 
-    	if (resultado.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
-    		return Optional.of("Invalid password");
+    	if (resultadoFactory.getStatusCode().isSameCodeAs(HttpStatus.UNAUTHORIZED)) {
+    		resultado.setToken("Invalid password");
+    		return resultado;
     	}
     	
-		if(resultado.getStatusCode().isSameCodeAs(HttpStatus.OK)) {
+		if(resultadoFactory.getStatusCode().isSameCodeAs(HttpStatus.OK)) {
 			String token = generateToken();  // Generate a random token for the session
 			tokenStore.put(token, usuario.get());     // Store the token and associate it with the Usuario
-			return Optional.of(token);
+			resultado.setToken(token);
+			resultado.setId(usuario.get().getId());
+			return resultado;
 		}
-		return Optional.of("Internal Server Error");
+		resultado.setToken("Internal Server Error");
+		return resultado;
     }
     
     // Logout method to remove the token from the session store

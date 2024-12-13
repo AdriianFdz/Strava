@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.deusto.sd.strava.dto.CredencialesDTO;
+import es.deusto.sd.strava.dto.TokenIdDTO;
 import es.deusto.sd.strava.dto.UsuarioDTO;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.service.AuthService;
@@ -63,21 +64,21 @@ public class AuthController {
         }
     )
     @PostMapping("/login")
-    public ResponseEntity<String> login(
+    public ResponseEntity<TokenIdDTO> login(
     		@Parameter(name = "credentials", description = "User's credentials", required = true)    	
     		@RequestBody CredencialesDTO credentials) {    	
     	
-    	Optional<String> resultado = authService.login(credentials.getEmail(), credentials.getPassword());
-    	if (resultado.get().equals("Invalid password")) {
-    		return new ResponseEntity<>(resultado.get(), HttpStatus.UNAUTHORIZED);
+    	TokenIdDTO resultado = authService.login(credentials.getEmail(), credentials.getPassword());
+    	if (resultado.getToken().equals("Invalid password")) {
+    		return new ResponseEntity<>(resultado, HttpStatus.UNAUTHORIZED);
     	}
-    	if (resultado.get().equals("Invalid email")) {
-    		return new ResponseEntity<>(resultado.get(), HttpStatus.NOT_FOUND);
+    	if (resultado.getToken().equals("Invalid email")) {
+    		return new ResponseEntity<>(resultado, HttpStatus.NOT_FOUND);
     	}
-    	if (resultado.get().equals("Internal Server Error")) {
-    		return new ResponseEntity<>(resultado.get(), HttpStatus.INTERNAL_SERVER_ERROR);
+    	if (resultado.getToken().equals("Internal Server Error")) {
+    		return new ResponseEntity<>(resultado, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-    	return new ResponseEntity<>(resultado.get(), HttpStatus.OK);
+    	return new ResponseEntity<>(resultado, HttpStatus.OK);
     }
 
     // Logout endpoint
