@@ -19,6 +19,7 @@ import es.deusto.sd.strava.dto.RetoDTO;
 import es.deusto.sd.strava.dto.RetoIdDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
 import es.deusto.sd.strava.entity.Reto;
+import es.deusto.sd.strava.entity.ServidorAuth;
 import es.deusto.sd.strava.entity.TipoDeporte;
 import es.deusto.sd.strava.entity.TipoObjetivo;
 import es.deusto.sd.strava.entity.Usuario;
@@ -209,6 +210,35 @@ public class StravaController {
 		}
 		return new ResponseEntity<>(TipoDeporte.values(), HttpStatus.OK);
 	}
+	
+	// get all objective types endpoint
+	@Operation(summary = "Get all objective types", description = "Allows a registered user to view all the available objective types.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: objective types retrieved successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
+	
+	@GetMapping("objectives")
+	public ResponseEntity<TipoObjetivo[]> getObjetivos(
+			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") @RequestParam("userToken") String userToken) {
+		if (!authService.isValidToken(userToken)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		return new ResponseEntity<>(TipoObjetivo.values(), HttpStatus.OK);
+	}
+	
+	// get auth server types endpoint
+	@Operation(summary = "Get auth server types", description = "Allows a registered user to view all the available auth server types.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: auth server types retrieved successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
+	
+	@GetMapping("auths")
+	public ResponseEntity<ServidorAuth[]> getAuths(
+			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") @RequestParam("userToken") String userToken) {
+		if (!authService.isValidToken(userToken)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		return new ResponseEntity<>(ServidorAuth.values(), HttpStatus.OK);
+	}
+	
 	
 	// parse DTO to entity
 	public Entrenamiento parseEntrenamientoDTO(EntrenamientoDTO dto, Usuario u) {
