@@ -33,7 +33,7 @@ public class RestTemplateServiceProxy implements IStravaServiceProxy{
     public RestTemplateServiceProxy(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
-
+    
     @Override
     public TokenId login(Credenciales credentials) {
         String url = apiBaseUrl + "/auth/login";
