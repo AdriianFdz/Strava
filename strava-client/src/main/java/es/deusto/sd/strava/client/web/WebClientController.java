@@ -309,4 +309,11 @@ public class WebClientController {
 	    }			
 	}
 	
+	@GetMapping("/selectChallengeOption")
+	public String getChallengeOption() {
+		return "selectChallenge.html";
+
+	}
+	
+	
 }
