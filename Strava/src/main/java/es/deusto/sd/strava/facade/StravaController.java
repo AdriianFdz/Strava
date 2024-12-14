@@ -20,6 +20,7 @@ import es.deusto.sd.strava.dto.RetoIdDTO;
 import es.deusto.sd.strava.entity.Entrenamiento;
 import es.deusto.sd.strava.entity.Reto;
 import es.deusto.sd.strava.entity.TipoDeporte;
+import es.deusto.sd.strava.entity.TipoObjetivo;
 import es.deusto.sd.strava.entity.Usuario;
 import es.deusto.sd.strava.service.AuthService;
 import es.deusto.sd.strava.service.StravaService;
@@ -85,7 +86,6 @@ public class StravaController {
 		if (!authService.isValidTokenWithUser(userToken, u)) {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);			
 		}
-		System.out.println("titulo: " + training.getTitulo());
 		stravaService.anadirEntrenamiento(u, parseEntrenamientoDTO(training, u));
         return new ResponseEntity<>(HttpStatus.OK);
 	}
@@ -194,6 +194,20 @@ public class StravaController {
 		Reto r = stravaService.getRetoById(idReto);
 		stravaService.aceptarReto(u, r);
 		return new ResponseEntity<>(HttpStatus.OK);
+	}
+	
+	// get all sport types endpoint
+	@Operation(summary = "Get all sport types", description = "Allows a registered user to view all the available sport types.", responses = {
+			@ApiResponse(responseCode = "200", description = "Success: sport types retrieved successfully"),
+			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
+	
+	@GetMapping("sports")
+	public ResponseEntity<TipoDeporte[]> getDeportes(
+			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") @RequestParam("userToken") String userToken) {
+		if (!authService.isValidToken(userToken)) {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+		return new ResponseEntity<>(TipoDeporte.values(), HttpStatus.OK);
 	}
 	
 	// parse DTO to entity

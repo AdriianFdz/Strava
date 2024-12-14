@@ -64,4 +64,6 @@ public interface IStravaServiceProxy {
 	Reto getChallengeDetail(String userToken, int idReto);
 	
 	void acceptChallenge(String userToken, int userId, int idReto);
+
+	List<String> getSports(String userToken);
 }

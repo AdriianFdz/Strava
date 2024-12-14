@@ -192,6 +192,9 @@ public class WebClientController {
 	        model.addAttribute("userId", userId);
 	        model.addAttribute("startDate", startDate);
 	        model.addAttribute("endDate", endDate);
+	        
+	        List<String> sports = stravaServiceProxy.getSports(token);
+	        model.addAttribute("tiposDeporte", sports);
 
 	        return "trainings"; // Thymeleaf renderiza la plantilla "trainings.html"
 	    } catch (RuntimeException e) {
@@ -215,13 +218,17 @@ public class WebClientController {
 
 	        // Si todo va bien, redirigimos a una página de éxito o a la vista de entrenamiento del usuario
 	        redirectAttributes.addFlashAttribute("message", "Entrenamiento agregado exitosamente");
-	        return "redirect:/users/" + userId + "/trainings"; // Redirigir a la página del usuario
+	        return "redirect:/users/trainings"; // Redirigir a la página del usuario
 
 	    } catch (Exception e) {
 	        // Si ocurre un error, registramos el error y redirigimos con un mensaje de error
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el entrenamiento");
+<<<<<<< HEAD
 	        return "errorPage"; // Redirigir a la página del usuario
+=======
+	        return "redirect:/users/trainings"; // Redirigir a la página del usuario
+>>>>>>> refs/remotes/origin/master
 	    }			
 	}
 	
@@ -285,8 +292,11 @@ public class WebClientController {
 
 	        model.addAttribute("retos", retos);
 	        model.addAttribute("fechaInicio", fechaInicio);
-	        model.addAttribute("fechafin", fechaFin);
+	        model.addAttribute("fechaFin", fechaFin);
 	        model.addAttribute("deporte", deporte);
+
+	        List<String> deportes = stravaServiceProxy.getSports(token);
+	        model.addAttribute("tiposDeporte", deportes);
 
 	        return "challenges"; 
 	    } catch (RuntimeException e) {
@@ -348,7 +358,7 @@ public class WebClientController {
 		return "selectChallenge";
 
 	}
-	
+		
 	public boolean isLogged(String token) {
 		if(token != null) {
 			return true;
