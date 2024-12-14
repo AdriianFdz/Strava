@@ -224,11 +224,9 @@ public class WebClientController {
 	        // Si ocurre un error, registramos el error y redirigimos con un mensaje de error
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el entrenamiento");
-<<<<<<< HEAD
+
 	        return "errorPage"; // Redirigir a la página del usuario
-=======
-	        return "redirect:/users/trainings"; // Redirigir a la página del usuario
->>>>>>> refs/remotes/origin/master
+
 	    }			
 	}
 	
