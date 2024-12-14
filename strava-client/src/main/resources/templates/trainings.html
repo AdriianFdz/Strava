@@ -80,15 +80,21 @@
 
         <!-- Add Training Form -->
         <h2 class="text-center text-dark fw-bold mt-5">Agregar Nuevo Entrenamiento</h2>
-        <form id="addTrainingForm" th:action="@{'/users/trainings'}" method="post" class="card p-4 shadow-sm border-0">
+        <form id="addTrainingForm" th:action="@{'/trainings'}" method="post" class="card p-4 shadow-sm border-0">
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Título del Entrenamiento:</label>
                 <input type="text" id="titulo" name="titulo" class="form-control" required>
             </div>
-            <div class="form-group mb-3">
-                <label class="form-label text-dark">Deporte:</label>
-                <input type="text" id="deporte" name="deporte" class="form-control" required>
-            </div>
+			<div class="form-group mb-3">
+			    <label class="form-label text-dark">Deporte:</label>
+			    <select id="tipoDeporte" name="tipoDeporte" class="form-select" required>
+			        <option th:each="tipo : ${tiposDeporte}" 
+			                th:value="${tipo}"
+			                th:text="${tipo}">
+			        </option>
+			    </select>
+			</div>
+
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Distancia (km):</label>
                 <input type="number" step="0.01" id="distancia" name="distancia" class="form-control" required>
@@ -127,7 +133,7 @@
             // Prepare the training data object
             var training = {
                 titulo: document.getElementById('titulo').value,
-                deporte: document.getElementById('deporte').value,
+                deporte: document.getElementById('tipoDeporte').value,
                 distancia: parseFloat(document.getElementById('distancia').value),
                 fechaHora: new Date(document.getElementById('fechaHora').value).getTime(),
                 duracion: parseInt(document.getElementById('duracion').value)
@@ -161,17 +167,25 @@
 	
 	<!-- JavaScript filterTrainingForm Submission -->
 	<script> 
-        document.getElementById('filterTrainingForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            var startDate = new Date(document.getElementById('startDate').value).getTime();
-            var endDate = new Date(document.getElementById('endDate').value).getTime();
-			
-            var url = new URL(this.action);
-            url.searchParams.append('startDate', startDate);
-            url.searchParams.append('endDate', endDate);
-            
-			history.pushState(null, '', url);
-			
+	    document.getElementById('filterTrainingForm').addEventListener('submit', function(event) {
+	        event.preventDefault();
+
+	        var startDate = document.getElementById('startDate').value;
+	        var endDate = document.getElementById('endDate').value;
+
+	        var url = new URL(this.action);
+
+	        // Validar si las fechas no están vacías y son válidas
+	        if (startDate != '') {
+	            url.searchParams.append('startDate', new Date(startDate).getTime());
+	        }
+
+	        if (endDate != '') {
+	            url.searchParams.append('endDate', new Date(endDate).getTime());
+	        }
+
+            history.pushState(null, '', url);
+
             fetch(url, {
                 method: 'GET',
                 headers: {
@@ -189,7 +203,8 @@
                 console.error('Error:', error);
                 alert('Hubo un error al filtrar los entrenamientos');
             });
-        });
-    </script>
+	    });
+	</script>
+
 </body>
 </html>

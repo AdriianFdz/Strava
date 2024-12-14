@@ -47,6 +47,13 @@
                     <label class="form-label text-dark">Fecha de Fin:</label>
                     <input type="date" id="fechaFin" name="fechaFin" class="form-control" th:value="${fechaFin != null ? #dates.format(new java.util.Date(fechaFin), 'yyyy-MM-dd') : ''}">
                 </div>
+				<div class="col-md-6">
+				    <label class="form-label text-dark">Tipo de Deporte:</label>
+				    <select id="tipoDeporte" name="tipoDeporte" class="form-select" aria-label="Tipo de Deporte">
+				        <option value="">Seleccione un tipo de deporte</option>
+						<option th:each="tipo : ${tiposDeporte}" th:value="${tipo}" th:text="${tipo}" th:selected="${tipo} == ${deporte}"></option>
+				    </select>
+				</div>
             </div>
             <button type="submit" class="btn btn-warning text-dark fw-bold mt-3 w-100">Filtrar</button>
         </form>
@@ -164,37 +171,55 @@
 	
 	<!-- JavaScript filterChallengeForm Submission -->
 	<script th:inline="javascript">
-        document.getElementById('filterChallengeForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-			
-			var fechaInicio = new Date(document.getElementById('startDate').value).getTime();
-		 	var fechaFin = new Date(document.getElementById('endDate').value).getTime();
-			
-            var url = new URL(this.action);
-			
-			url.searchParams.append('fechaInicio', fechaInicio);
-			url.searchParams.append('fechaFin', fechaFin);
+	    document.getElementById('filterChallengeForm').addEventListener('submit', function(event) {
+	        event.preventDefault();
+	        
+	        var fechaInicio = document.getElementById('fechaInicio').value;
+	        var fechaFin = document.getElementById('fechaFin').value;
+	        var tipoDeporte = document.getElementById('tipoDeporte').value;
 
-			history.pushState(null, '', url);
+	        var url = new URL(this.action);
 
-            fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-			.then(response => {
-                if (response.ok) {
-                    window.location.reload();
-                } else {
-                    alert('Error al filtrar los retos');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Hubo un error al filtrar los retos');
-            });
-        });
-    </script>
+	        // Validar fechas y tipoDeporte
+	        if (fechaInicio && !isNaN(new Date(fechaInicio).getTime())) {
+	            url.searchParams.append('startDate', new Date(fechaInicio).getTime());
+	        }
+
+	        if (fechaFin && !isNaN(new Date(fechaFin).getTime())) {
+	            url.searchParams.append('endDate', new Date(fechaFin).getTime());
+	        }
+
+	        if (tipoDeporte && tipoDeporte != '') {
+	            url.searchParams.append('sport', tipoDeporte);
+	        }
+
+	        // Solo actualiza la URL y realiza la solicitud si alguna de las fechas es válida
+	        if (fechaInicio || fechaFin || tipoDeporte) {
+	            history.pushState(null, '', url);
+
+	            fetch(url, {
+	                method: 'GET',
+	                headers: {
+	                    'Content-Type': 'application/json',
+	                }
+	            })
+	            .then(response => {
+	                if (response.ok) {
+	                    window.location.reload();
+	                } else {
+	                    alert('Error al filtrar los retos');
+	                }
+	            })
+	            .catch(error => {
+	                console.error('Error:', error);
+	                alert('Hubo un error al filtrar los retos');
+	            });
+	        } else {
+	            alert('Por favor, ingrese fechas o un deporte válido');
+	        }
+	    });
+	</script>
+
+	
 </body>
 </html>

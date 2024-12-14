@@ -36,7 +36,7 @@ public class StravaService {
 		return retoRepository.findById(id).get();
 	}
 	
-	public List<Entrenamiento> filtrarEntrenamientosPorUsuario(int id, long fechaInicio, long fechaFin) {
+	public List<Entrenamiento> filtrarEntrenamientosPorUsuario(int id, Long fechaInicio, Long fechaFin) {
 		return entrenamientoRepository.filtrarEntrenamientosPorUsuario(id, fechaInicio, fechaFin);
 	}
 	
@@ -49,7 +49,7 @@ public class StravaService {
 		retoRepository.save(r);
 	}
 	
-	public List<Reto> filtrarRetos(long fechaInicio, long fechaFin, TipoDeporte deporte) {
+	public List<Reto> filtrarRetos(Long fechaInicio, Long fechaFin, TipoDeporte deporte) {
 		return retoRepository.filtrarRetos(fechaInicio, fechaFin, deporte);
 	}
 	
