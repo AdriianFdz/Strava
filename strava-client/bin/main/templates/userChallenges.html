@@ -45,7 +45,7 @@
                     <td th:text="${entry.key}"></td>
                     <td th:text="${entry.value}"></td>
                     <td>
-                        <a href="/" class="btn btn-sm btn-warning text-dark fw-bold">
+                        <a th:href="@{/challenges/{idReto}(idReto=${entry.key})}" class="btn btn-sm btn-warning text-dark fw-bold">
                             Ver Más <i class="fas fa-arrow-right"></i>
                         </a>
                     </td>
