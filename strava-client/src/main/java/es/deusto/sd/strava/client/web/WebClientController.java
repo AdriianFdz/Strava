@@ -155,6 +155,8 @@ public class WebClientController {
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
 
+		if (!isLogged(token)) return "redirect:/login?redirectUrl=/users/trainings";
+		
 	    try {
 	        // Llama al servicio proxy para obtener los entrenamientos del usuario
 	        List<Entrenamiento> trainings = stravaServiceProxy.getTrainings(token, userId, startDate, endDate);
@@ -247,7 +249,9 @@ public class WebClientController {
 	        @RequestParam(value = "sport", required = false) String deporte,
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
-
+			
+		if (!isLogged(token)) return "redirect:/login?redirectUrl=/challenges";
+		
 	    try {
 	        List<Reto> retos = stravaServiceProxy.getChallenges(token, fechaInicio, fechaFin, deporte);
 
@@ -268,7 +272,9 @@ public class WebClientController {
 	public String getUserChallenges(
 	        Model model,
 	        RedirectAttributes redirectAttributes) {
-
+		
+		if (!isLogged(token)) return "redirect:/login?redirectUrl=/users/challenges";
+		
 	    try {
 	        // Mapa con ID del reto y porcentaje completado
 	        Map<Integer, Double> userChallenges = stravaServiceProxy.getUserChallenges(token, userId);
@@ -311,8 +317,15 @@ public class WebClientController {
 	
 	@GetMapping("/selectChallengeOption")
 	public String getChallengeOption() {
-		return "selectChallenge.html";
+		return "selectChallenge";
 
+	}
+	
+	public boolean isLogged(String token) {
+		if(token != null) {
+			return true;
+		}
+		return false;
 	}
 	
 	
