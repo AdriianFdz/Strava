@@ -40,17 +40,15 @@
         <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
         <!-- Filter Form -->
-        <form th:action="@{'/users/' + ${userId} + '/trainings'}" method="get" class="mb-4">
+        <form id="filterTrainingForm" th:action="@{'/users/trainings'}" method="get" class="mb-4">
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label text-dark">Fecha de Inicio:</label>
-                    <input type="date" name="startDate" class="form-control" 
-                           th:value="${startDate != null ? #dates.format(new java.util.Date(startDate), 'yyyy-MM-dd') : ''}">
+                    <input type="datetime-local" id="startDate" name="startDate" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <label class="form-label text-dark">Fecha de Fin:</label>
-                    <input type="date" name="endDate" class="form-control"
-                           th:value="${endDate != null ? #dates.format(new java.util.Date(endDate), 'yyyy-MM-dd') : ''}">
+                    <input type="datetime-local" id="endDate" name="endDate" class="form-control">
                 </div>
             </div>
             <button type="submit" class="btn btn-warning text-dark fw-bold mt-3 w-100">Filtrar</button>
@@ -80,7 +78,7 @@
 
         <!-- Add Training Form -->
         <h2 class="text-center text-dark fw-bold mt-5">Agregar Nuevo Entrenamiento</h2>
-        <form id="trainingForm" th:action="@{'/users/' + ${userId} + '/trainings'}" method="post" class="card p-4 shadow-sm border-0">
+        <form id="addTrainingForm" th:action="@{'/users/trainings'}" method="post" class="card p-4 shadow-sm border-0">
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Título del Entrenamiento:</label>
                 <input type="text" id="titulo" name="titulo" class="form-control" required>
@@ -119,9 +117,9 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- JavaScript Form Submission -->
+    <!-- JavaScript addTrainingForm Submission -->
     <script th:inline="javascript">
-        document.getElementById('trainingForm').addEventListener('submit', function(event) {
+        document.getElementById('addTrainingForm').addEventListener('submit', function(event) {
             event.preventDefault();
 
             // Prepare the training data object
@@ -155,6 +153,39 @@
             .catch(error => {
                 console.error('Error:', error);
                 alert('Hubo un error al agregar el entrenamiento');
+            });
+        });
+    </script>
+	
+	<!-- JavaScript filterTrainingForm Submission -->
+	<script> 
+        document.getElementById('filterTrainingForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var startDate = new Date(document.getElementById('startDate').value).getTime();
+            var endDate = new Date(document.getElementById('endDate').value).getTime();
+			
+            var url = new URL(this.action);
+            url.searchParams.append('startDate', startDate);
+            url.searchParams.append('endDate', endDate);
+            
+			history.pushState(null, '', url);
+			
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Error al filtrar los entrenamientos');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Hubo un error al filtrar los entrenamientos');
             });
         });
     </script>

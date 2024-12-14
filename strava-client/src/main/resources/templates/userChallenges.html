@@ -82,7 +82,7 @@
 
         <!-- Formulario para agregar reto -->
         <h2 class="text-center text-dark fw-bold mt-4">Agregar Reto</h2>
-        <form id="challengeForm" th:action="@{'/challenges'}" method="post" class="card p-4 shadow-sm border-0">
+        <form id="challengeForm" th:action="@{'users/challenges'}" method="post" class="card p-4 shadow-sm border-0">
             <div class="mb-3">
                 <label for="idReto" class="form-label text-dark">ID Reto:</label>
                 <input type="number" id="idReto" name="idReto" class="form-control" placeholder="Introduce el ID del reto" required>
@@ -114,7 +114,7 @@
 	        var challengeId = document.getElementById('idReto').value;
 
 	        // Construir la URL dinámica
-			var url = `/users/challenges/${challengeId}`;
+			var url = new URL(this.action);
 
 	        fetch(url, {
 	            method: 'POST',
