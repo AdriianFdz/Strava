@@ -23,6 +23,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import es.deusto.sd.strava.client.data.Reto;
 import es.deusto.sd.strava.client.data.TokenId;
+import es.deusto.sd.strava.client.data.Usuario;
 import es.deusto.sd.strava.client.data.Credenciales;
 import es.deusto.sd.strava.client.data.Entrenamiento;
 import es.deusto.sd.strava.client.proxies.IStravaServiceProxy;
@@ -106,6 +107,31 @@ public class WebClientController {
 		return "index";
 	}
 
+	@GetMapping("/register")
+	public String showRegister(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
+			Model model) {
+		model.addAttribute("redirectUrl", redirectUrl);
+		
+		return "register";
+	}
+	
+	@PostMapping("/register")
+	public String performRegister(@RequestBody Usuario u, Model model, RedirectAttributes redirectAttributes) {
+	    try {
+	        // Llamada al servicio para agregar el entrenamiento
+	        stravaServiceProxy.register(u);
+
+	        // Si todo va bien, redirigimos a una página de éxito o a la vista de entrenamiento del usuario
+	        redirectAttributes.addFlashAttribute("message", "Usuario registrado exitosamente");
+	        return "index"; 
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error en el registro");
+	        return "errorPage"; // Redirigir a la página del usuario
+	    }
+	}
+	
 	@GetMapping("/login")
 	public String showLoginPage(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 			Model model) {
@@ -142,6 +168,7 @@ public class WebClientController {
 			model.addAttribute("successMessage", "Logout successful.");
 		} catch (RuntimeException e) {
 			model.addAttribute("errorMessage", "Logout failed: " + e.getMessage());
+			return "errorPage";
 		}
 
 		// Redirect to the specified URL after logout
@@ -171,7 +198,7 @@ public class WebClientController {
 	    	e.printStackTrace();
 	        // Si ocurre un error, añade el mensaje al modelo
 	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los entrenamientos: " + e.getMessage());
-	        return "redirect:/error"; // Redirige a una página de error o a otra apropiada
+	        return "errorPage"; // Redirige a una página de error o a otra apropiada
 	    }
 	
 	}
@@ -194,7 +221,7 @@ public class WebClientController {
 	        // Si ocurre un error, registramos el error y redirigimos con un mensaje de error
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el entrenamiento");
-	        return "redirect:/users/" + userId + "/trainings"; // Redirigir a la página del usuario
+	        return "errorPage"; // Redirigir a la página del usuario
 	    }			
 	}
 	
@@ -217,7 +244,7 @@ public class WebClientController {
 	        // Si ocurre un error, registramos el error y redirigimos con un mensaje de error
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al agregar el reto");
-	        return "redirect:/challenges"; // Redirigir a la página del usuario
+	        return "errorPage"; // Redirigir a la página del usuario
 	    }			
 	}
 	
@@ -238,6 +265,7 @@ public class WebClientController {
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Hubo un error al aceptar el reto");
+	        return "errorPage";
 	    }			
         return "redirect:/users/challenges"; 
 	}
@@ -264,7 +292,7 @@ public class WebClientController {
 	    } catch (RuntimeException e) {
 	    	e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los retos: " + e.getMessage());
-	        return "redirect:/error"; 
+	        return "errorPage"; 
 	    }			
 	}
 	
@@ -291,7 +319,7 @@ public class WebClientController {
 	    } catch (RuntimeException e) {
 	        e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener los retos: " + e.getMessage());
-	        return "redirect:/error"; 
+	        return "errorPage"; 
 	    }
 	}
 	
@@ -311,7 +339,7 @@ public class WebClientController {
 	    } catch (RuntimeException e) {
 	    	e.printStackTrace();
 	        redirectAttributes.addFlashAttribute("errorMessage", "Error al obtener el detalle del reto: " + e.getMessage());
-	        return "redirect:/error"; 
+	        return "errorPage"; 
 	    }			
 	}
 	
