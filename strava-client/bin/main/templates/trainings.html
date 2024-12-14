@@ -42,14 +42,16 @@
         <!-- Filter Form -->
         <form id="filterTrainingForm" th:action="@{'/users/trainings'}" method="get" class="mb-4">
             <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label text-dark">Fecha de Inicio:</label>
-                    <input type="datetime-local" id="startDate" name="startDate" class="form-control">
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label text-dark">Fecha de Fin:</label>
-                    <input type="datetime-local" id="endDate" name="endDate" class="form-control">
-                </div>
+				<div class="col-md-6">
+				    <label class="form-label text-dark">Fecha de Inicio:</label>
+				    <input type="datetime-local" id="startDate" name="startDate" class="form-control"
+				    th:value="${startDate != null ? #temporals.format(T(java.time.Instant).ofEpochMilli(startDate), 'yyyy-MM-dd''T''HH:mm') : ''}">
+				</div>
+				<div class="col-md-6">
+				    <label class="form-label text-dark">Fecha de Fin:</label>
+				    <input type="datetime-local" id="endDate" name="endDate" class="form-control"
+				    th:value="${endDate != null ? #temporals.format(T(java.time.Instant).ofEpochMilli(endDate), 'yyyy-MM-dd''T''HH:mm') : ''}">
+				</div>
             </div>
             <button type="submit" class="btn btn-warning text-dark fw-bold mt-3 w-100">Filtrar</button>
         </form>
