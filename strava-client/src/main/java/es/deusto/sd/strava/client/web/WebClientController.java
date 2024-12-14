@@ -295,7 +295,10 @@ public class WebClientController {
 
 	        List<String> deportes = stravaServiceProxy.getSports(token);
 	        model.addAttribute("tiposDeporte", deportes);
-
+	        
+	        List<String> objetivos = stravaServiceProxy.getObjectives(token);
+	        model.addAttribute("tiposObjetivo", objetivos);
+	        
 	        return "challenges"; 
 	    } catch (RuntimeException e) {
 	    	e.printStackTrace();

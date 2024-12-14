@@ -89,11 +89,11 @@
         <form id="addChallengeForm" th:action="@{'/challenges'}" method="post" class="card p-4 shadow-sm border-0">
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Nombre del Reto:</label>
-                <input type="text" id="nombre" name="nombre" class="form-control" required>
+                <input type="text" id="nombreAdd" name="nombreAdd" class="form-control" required>
             </div>
 			<div class="form-group mb-3">
 			    <label class="form-label text-dark">Deporte:</label>
-			    <select id="tipoDeporte" name="tipoDeporte" class="form-select" required>
+			    <select id="tipoDeporteAdd" name="tipoDeporteAdd" class="form-select" required>
 			        <option th:each="tipo : ${tiposDeporte}" 
 			                th:value="${tipo}"
 			                th:text="${tipo}">
@@ -102,19 +102,24 @@
 			</div>
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Objetivo:</label>
-                <input type="number" step="0.01" id="objetivo" name="objetivo" class="form-control" required>
+                <input type="number" step="0.01" id="objetivoAdd" name="objetivoAdd" class="form-control" required>
             </div>
-            <div class="form-group mb-3">
-                <label class="form-label text-dark">Tipo Objetivo:</label>
-                <input type="text" id="tipoObjetivo" name="tipoObjetivo" class="form-control" required>
-            </div>
+			<div class="form-group mb-3">
+			    <label class="form-label text-dark">Objetivo:</label>
+			    <select id="tipoObjetivoAdd" name="tipoObjetivoAdd" class="form-select" required>
+			        <option th:each="tipo : ${tiposObjetivo}" 
+			                th:value="${tipo}"
+			                th:text="${tipo}">
+			        </option>
+			    </select>
+			</div>
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Fecha de Inicio:</label>
-                <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" required>
+                <input type="date" id="fechaInicioAdd" name="fechaInicioAdd" class="form-control" required>
             </div>
             <div class="form-group mb-3">
                 <label class="form-label text-dark">Fecha de Fin:</label>
-                <input type="date" id="fechaFin" name="fechaFin" class="form-control" required>
+                <input type="date" id="fechaFinAdd" name="fechaFinAdd" class="form-control" required>
             </div>
             <button type="submit" class="btn btn-warning text-dark fw-bold w-100">Agregar Reto</button>
         </form>
@@ -140,12 +145,12 @@
 
 	        // Prepare the challenge data object
 	        var challenge = {
-	            nombre: document.getElementById('nombre').value,
-                deporte: document.getElementById('deporte').value,
-                objetivo: document.getElementById('objetivo').value,
-                tipoObjetivo: document.getElementById('tipoObjetivo').value,
-                fechaInicio: new Date(document.getElementById('fechaInicio').value).getTime(),
-                fechaFin: new Date(document.getElementById('fechaFin').value).getTime()
+	            nombre: document.getElementById('nombreAdd').value,
+                deporte: document.getElementById('tipoDeporteAdd').value,
+                objetivo: document.getElementById('objetivoAdd').value,
+                tipoObjetivo: document.getElementById('tipoObjetivoAdd').value,
+                fechaInicio: new Date(document.getElementById('fechaInicioAdd').value).getTime(),
+                fechaFin: new Date(document.getElementById('fechaFinAdd').value).getTime()
 	        };
 
 	        // Construct the URL with query parameters

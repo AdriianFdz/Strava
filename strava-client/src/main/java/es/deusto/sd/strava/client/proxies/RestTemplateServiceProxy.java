@@ -211,5 +211,19 @@ public class RestTemplateServiceProxy implements IStravaServiceProxy{
     		}
     	}        
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getObjectives(String userToken){
+		String url = String.format("%s/strava/objectives?userToken=%s", apiBaseUrl, userToken);
+        try {
+    		return restTemplate.getForObject(url, List.class);
+    	} catch (HttpStatusCodeException e) {
+    		switch (e.getStatusCode().value()) {
+    		case 401: throw new RuntimeException("Credenciales incorrectas");
+    		default: throw new RuntimeException("Error al recuperar los objetivos");
+    		}
+    	}
+    }
 
 }
