@@ -5,7 +5,6 @@
  */
 package es.deusto.sd.strava.client.web;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -95,28 +94,23 @@ public class WebClientController {
 	}
 
 	@GetMapping("/")
-	public String home(Model model) {
-		List<Reto> categories = new ArrayList<Reto>();
-
-		try {
-			model.addAttribute("categories", categories);
-		} catch (RuntimeException e) {
-			model.addAttribute("errorMessage", "Failed to load categories: " + e.getMessage());
-		}
-
+	public String home() {
 		return "index";
 	}
 
 	@GetMapping("/register")
 	public String showRegister(@RequestParam(value = "redirectUrl", required = false) String redirectUrl,
 			Model model) {
+		
+		List<String> auths = stravaServiceProxy.getAuths();
+		model.addAttribute("tipoAuth", auths);
 		model.addAttribute("redirectUrl", redirectUrl);
 		
 		return "register";
 	}
 	
 	@PostMapping("/register")
-	public String performRegister(@RequestBody Usuario u, Model model, RedirectAttributes redirectAttributes) {
+	public String performRegister(@RequestBody Usuario u, RedirectAttributes redirectAttributes) {
 	    try {
 	        // Llamada al servicio para agregar el entrenamiento
 	        stravaServiceProxy.register(u);
@@ -208,7 +202,6 @@ public class WebClientController {
 	@PostMapping("/trainings")
 	public String addTraining(
 			@RequestBody Entrenamiento entrenamiento,
-			Model model,
 			RedirectAttributes redirectAttributes
 			) {
 			
@@ -233,7 +226,6 @@ public class WebClientController {
 	@PostMapping("/challenges")
 	public String addReto(
 			@RequestBody Reto reto,
-			Model model,
 			RedirectAttributes redirectAttributes
 			) {
 			
@@ -258,7 +250,6 @@ public class WebClientController {
 	@PostMapping("/users/challenges/{challengeId}")
 	public String acceptChallenge(
 	        @PathVariable int challengeId,
-			Model model,
 			RedirectAttributes redirectAttributes
 			) {
 			
@@ -354,7 +345,7 @@ public class WebClientController {
 	    }			
 	}
 	
-	@GetMapping("/selectChallengeOption")
+	@GetMapping("/challengeOption")
 	public String getChallengeOption() {
 		return "selectChallenge";
 

@@ -68,4 +68,6 @@ public interface IStravaServiceProxy {
 	List<String> getSports(String userToken);
 
 	List<String> getObjectives(String userToken);
+	
+	List<String> getAuths();
 }

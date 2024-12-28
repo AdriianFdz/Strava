@@ -231,11 +231,7 @@ public class StravaController {
 			@ApiResponse(responseCode = "401", description = "Unauthorized: Invalid token, logout failed"), })
 	
 	@GetMapping("auths")
-	public ResponseEntity<ServidorAuth[]> getAuths(
-			@Parameter(name = "userToken", description = "The token of a logged user", required = true, example = "192ee4daf90") @RequestParam("userToken") String userToken) {
-		if (!authService.isValidToken(userToken)) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-		}
+	public ResponseEntity<ServidorAuth[]> getAuths() {
 		return new ResponseEntity<>(ServidorAuth.values(), HttpStatus.OK);
 	}
 	

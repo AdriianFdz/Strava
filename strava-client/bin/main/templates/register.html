@@ -55,8 +55,10 @@
                             <!-- Servidor de Autenticación -->
                             <div class="mb-3">
                                 <label for="servidorAuth" class="form-label">Servidor de Autenticación</label>
-                                <input type="text" id="servidorAuth" name="servidorAuth" class="form-control" placeholder="Servidor de autenticación" required>
-                            </div>
+								<select id="servidorAuth" name="servidorAuth" class="form-select" aria-label="Tipo de Deporte">
+									<option th:each="tipo : ${tipoAuth}" th:value="${tipo}" th:text="${tipo}"></option>
+								</select>                             
+							</div>
                             <!-- Peso -->
                             <div class="mb-3">
                                 <label for="peso" class="form-label">Peso (kg)</label>
