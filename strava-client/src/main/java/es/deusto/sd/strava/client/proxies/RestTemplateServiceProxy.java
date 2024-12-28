@@ -108,7 +108,6 @@ public class RestTemplateServiceProxy implements IStravaServiceProxy{
             headers.set("Content-Type", "application/json");
             restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(training, headers), Void.class);
         } catch (HttpStatusCodeException e) {
-            e.printStackTrace();
         	switch (e.getStatusCode().value()) {
                 case 401 -> throw new RuntimeException("Unauthorized: Invalid token");
                 default -> throw new RuntimeException("Failed to add training: " + e.getStatusText());
